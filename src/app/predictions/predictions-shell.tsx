@@ -13,14 +13,13 @@ const ROLES: RoleFilter[] = ['All Roles', 'Batsman', 'Bowler', 'All-Rounder', 'W
 interface Props {
   players: PlayerWithPrediction[];
   teams: Team[];
-  isAdmin: boolean;
 }
 
 function hasResult(p: PlayerWithPrediction) {
   return p.auction?.sold_price != null;
 }
 
-export function PredictionsShell({ players, teams, isAdmin }: Props) {
+export function PredictionsShell({ players, teams }: Props) {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [role, setRole] = useState<RoleFilter>('All Roles');
@@ -51,8 +50,40 @@ export function PredictionsShell({ players, teams, isAdmin }: Props) {
     { key: 'results', label: 'Results', count: counts.results, icon: '📊' },
   ];
 
+  const totalPredicted = players.filter((p) => !!p.prediction).length;
+  const progressPct = players.length > 0 ? (totalPredicted / players.length) * 100 : 0;
+
   return (
     <div className="mx-auto max-w-5xl space-y-4">
+      {/* Page header */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">✨</span>
+          <h1 className="text-2xl font-bold">
+            Predict the <span className="text-primary">Auction</span>
+          </h1>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Predict the selling price and buying team for each player before the auction!
+        </p>
+      </div>
+
+      {/* Progress bar */}
+      <div className="rounded-xl bg-white p-4 ring-1 ring-border">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-medium">Your Progress</span>
+          <span className="font-semibold">
+            {totalPredicted} / {players.length} predicted
+          </span>
+        </div>
+        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-emerald-600 via-emerald-400 to-amber-400 transition-all duration-500"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+      </div>
+
       {/* Search */}
       <input
         type="text"
@@ -118,7 +149,6 @@ export function PredictionsShell({ players, teams, isAdmin }: Props) {
             key={player.id}
             player={player}
             teams={teams}
-            isAdmin={isAdmin}
           />
         ))}
         {filtered.length === 0 && (

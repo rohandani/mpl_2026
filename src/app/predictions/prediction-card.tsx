@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
-import { submitPrediction, setPlayerResult } from './actions';
+import { submitPrediction } from './actions';
 import { calcTotalPoints } from '@/lib/scoring';
 import type { PlayerWithPrediction } from '@/types/prediction';
 import type { Team } from '@/types/team';
@@ -12,29 +12,19 @@ import type { Team } from '@/types/team';
 interface Props {
   player: PlayerWithPrediction;
   teams: Team[];
-  isAdmin: boolean;
 }
 
-export function PredictionCard({ player, teams, isAdmin }: Props) {
+export function PredictionCard({ player, teams }: Props) {
   const hasResult = player.auction?.sold_price != null;
   const hasPrediction = !!player.prediction;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  // Prediction form state
   const [price, setPrice] = useState(
     player.prediction?.predicted_price?.toString() ?? ''
   );
   const [teamId, setTeamId] = useState(
     player.prediction?.predicted_team_id ?? ''
-  );
-
-  // Admin result form state
-  const [resultPrice, setResultPrice] = useState(
-    player.auction?.sold_price?.toString() ?? ''
-  );
-  const [resultTeamId, setResultTeamId] = useState(
-    player.auction?.sold_to_team_id ?? ''
   );
 
   function handleSubmitPrediction() {
@@ -45,19 +35,6 @@ export function PredictionCard({ player, teams, isAdmin }: Props) {
     });
   }
 
-  function handleSetResult() {
-    setError(null);
-    startTransition(async () => {
-      const res = await setPlayerResult(
-        player.id,
-        Number(resultPrice),
-        resultTeamId
-      );
-      if (!res.success) setError(res.error);
-    });
-  }
-
-  // Calculate score if result is out and user predicted
   const score =
     hasResult && hasPrediction
       ? calcTotalPoints(
@@ -212,46 +189,6 @@ export function PredictionCard({ player, teams, isAdmin }: Props) {
                 : hasPrediction
                   ? 'Update Prediction'
                   : 'Submit Prediction 🎯'}
-            </Button>
-          </div>
-        )}
-
-        {/* Admin: set result */}
-        {isAdmin && !hasResult && (
-          <div className="space-y-2.5 rounded-lg border border-amber-200 bg-amber-50 p-3">
-            <p className="text-xs font-semibold text-amber-800">
-              ⚙️ Admin: Set Result
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                min={0}
-                placeholder="Sold price"
-                value={resultPrice}
-                onChange={(e) => setResultPrice(e.target.value)}
-                className="h-8 w-full rounded-lg border border-border bg-white px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
-              />
-              <select
-                value={resultTeamId}
-                onChange={(e) => setResultTeamId(e.target.value)}
-                className="h-8 w-full rounded-lg border border-border bg-white px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
-              >
-                <option value="">Team</option>
-                {teams.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Button
-              variant="outline"
-              onClick={handleSetResult}
-              disabled={isPending || !resultPrice || !resultTeamId}
-              className="w-full"
-              size="sm"
-            >
-              {isPending ? 'Saving…' : 'Set Result'}
             </Button>
           </div>
         )}
