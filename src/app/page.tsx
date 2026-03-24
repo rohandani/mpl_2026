@@ -3,8 +3,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/auth/roles";
 import { AppHeader } from "@/components/app-header";
+import { SponsorBanner } from "@/components/sponsor-banner";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import type { ShareConfig } from "@/types/share-config";
+import type { Sponsor } from "@/types/sponsor";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -12,15 +14,15 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: shareConfig } = await supabase
-    .from('share_config')
-    .select('*')
-    .eq('id', 'default')
-    .single();
+  const [{ data: shareConfig }, { data: sponsors }] = await Promise.all([
+    supabase.from('share_config').select('*').eq('id', 'default').single(),
+    supabase.from('sponsors').select('*').eq('is_active', true).order('display_order'),
+  ]);
 
   const displayName =
     user?.user_metadata?.full_name ?? user?.email ?? "Player";
   const config = shareConfig as ShareConfig | null;
+  const activeSponors = (sponsors as Sponsor[]) ?? [];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -30,6 +32,7 @@ export default async function HomePage() {
           userName: displayName,
           title: config?.title,
           customHashtags: config?.hashtags,
+          sponsorNames: activeSponors.map((s) => s.name),
         }}
       />
 
@@ -86,6 +89,8 @@ export default async function HomePage() {
               </Card>
             </Link>
           </div>
+
+          <SponsorBanner sponsors={activeSponors} />
         </div>
       </main>
     </div>

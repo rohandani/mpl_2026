@@ -6,6 +6,7 @@ import { PredictionsShell } from './predictions-shell';
 import type { PlayerWithPrediction, Auction } from '@/types/prediction';
 import type { Team } from '@/types/team';
 import type { ShareConfig } from '@/types/share-config';
+import type { Sponsor } from '@/types/sponsor';
 
 export default async function PredictionsPage() {
   const supabase = await createClient();
@@ -21,12 +22,14 @@ export default async function PredictionsPage() {
     { data: predictions },
     { data: teams },
     { data: shareConfig },
+    { data: sponsors },
   ] = await Promise.all([
     supabase.from('players').select('id, name, role, base_price, is_captain, team_id').eq('is_captain', false).order('name'),
     supabase.from('auctions').select('*'),
     supabase.from('predictions').select('*').eq('user_id', user.id),
     supabase.from('teams').select('*'),
     supabase.from('share_config').select('*').eq('id', 'default').single(),
+    supabase.from('sponsors').select('name').eq('is_active', true).order('display_order'),
   ]);
 
   const auctionMap = new Map(
@@ -50,6 +53,8 @@ export default async function PredictionsPage() {
 
   const config = shareConfig as ShareConfig | null;
 
+  const sponsorNames = ((sponsors as Sponsor[]) ?? []).map((s) => s.name);
+
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader
@@ -58,6 +63,7 @@ export default async function PredictionsPage() {
           userName: displayName,
           title: config?.title,
           customHashtags: config?.hashtags,
+          sponsorNames,
           predictionsText: `${totalPredicted} / ${totalPlayers}`,
           tagline: 'Think you can beat me? Join now!',
         }}

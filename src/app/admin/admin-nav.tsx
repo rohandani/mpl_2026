@@ -7,6 +7,7 @@ const tabs = [
   { label: "Teams", href: "/admin/teams" },
   { label: "Players", href: "/admin/players" },
   { label: "Auctions", href: "/admin/auctions" },
+  { label: "Sponsors", href: "/admin/sponsors" },
   { label: "Share Config", href: "/admin/share-config" },
 ];
 

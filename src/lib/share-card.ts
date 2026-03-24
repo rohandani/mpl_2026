@@ -10,6 +10,8 @@ export interface ShareCardData {
   title?: string;
   /** Configurable hashtags from admin, e.g. ["#CricketAuction"] */
   customHashtags?: string[];
+  /** Active sponsor names to show on the card */
+  sponsorNames?: string[];
   /** e.g. "12 / 20 predicted" */
   predictionsText?: string;
   /** e.g. "195 pts" */
@@ -175,6 +177,18 @@ export async function generateShareCard(data: ShareCardData): Promise<Blob> {
   ctx.font = '26px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(uniqueHashtags.join('  '), CARD_W / 2, nextY);
+  nextY += 50;
+
+  // Sponsors
+  if (data.sponsorNames && data.sponsorNames.length > 0) {
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '20px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Sponsored by', CARD_W / 2, nextY);
+    ctx.fillStyle = '#374151';
+    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+    ctx.fillText(data.sponsorNames.join('  ·  '), CARD_W / 2, nextY + 35);
+  }
 
   // Bottom accent bar
   ctx.fillStyle = bar;
