@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/auth/roles";
 import { AppHeader } from "@/components/app-header";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import type { ShareConfig } from "@/types/share-config";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -11,12 +12,26 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: shareConfig } = await supabase
+    .from('share_config')
+    .select('*')
+    .eq('id', 'default')
+    .single();
+
   const displayName =
     user?.user_metadata?.full_name ?? user?.email ?? "Player";
+  const config = shareConfig as ShareConfig | null;
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AppHeader showAdmin={isAdmin(user)} />
+      <AppHeader
+        showAdmin={isAdmin(user)}
+        shareCardData={{
+          userName: displayName,
+          title: config?.title,
+          customHashtags: config?.hashtags,
+        }}
+      />
 
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-2xl space-y-6">

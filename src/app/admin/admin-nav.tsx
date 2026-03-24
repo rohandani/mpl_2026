@@ -7,6 +7,7 @@ const tabs = [
   { label: "Teams", href: "/admin/teams" },
   { label: "Players", href: "/admin/players" },
   { label: "Auctions", href: "/admin/auctions" },
+  { label: "Share Config", href: "/admin/share-config" },
 ];
 
 export function AdminNav() {

@@ -2,9 +2,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SignOutButton } from '@/components/sign-out-button';
 import { ShareButton } from '@/components/share-button';
+import type { ShareCardData } from '@/lib/share-card';
 
 interface AppHeaderProps {
   showAdmin?: boolean;
+  shareCardData?: ShareCardData;
 }
 
 const NAV_LINKS = [
@@ -13,7 +15,7 @@ const NAV_LINKS = [
   { href: '/teams', label: '🏏 Teams' },
 ];
 
-export function AppHeader({ showAdmin = false }: AppHeaderProps) {
+export function AppHeader({ showAdmin = false, shareCardData }: AppHeaderProps) {
   return (
     <header className="border-b border-primary/30 bg-white px-4 py-3">
       <div className="flex items-center justify-between">
@@ -35,7 +37,7 @@ export function AppHeader({ showAdmin = false }: AppHeaderProps) {
               {link.label}
             </Link>
           ))}
-          <ShareButton />
+          <ShareButton cardData={shareCardData} />
           {showAdmin && (
             <Link
               href="/admin"
