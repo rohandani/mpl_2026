@@ -7,6 +7,8 @@ const tabs = [
   { label: "Teams", href: "/admin/teams" },
   { label: "Players", href: "/admin/players" },
   { label: "Auctions", href: "/admin/auctions" },
+  { label: "Fixtures", href: "/admin/fixtures" },
+  { label: "Match Settings", href: "/admin/match-settings" },
   { label: "Sponsors", href: "/admin/sponsors" },
   { label: "Share Config", href: "/admin/share-config" },
 ];

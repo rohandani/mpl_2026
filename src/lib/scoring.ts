@@ -1,3 +1,5 @@
+import type { Fixture, MatchPrediction, MatchSettings } from '@/types/fixture';
+
 /**
  * MPL 2026 Prediction Scoring
  *
@@ -32,4 +34,71 @@ export function calcTotalPoints(
   const teamPoints = predictedTeamId === actualTeamId ? TEAM_POINTS : 0;
   const pricePoints = calcPricePoints(predictedPrice, actualPrice);
   return { teamPoints, pricePoints, total: teamPoints + pricePoints };
+}
+
+
+/**
+ * Match Prediction Scoring
+ *
+ * Compares a user's match prediction against actual fixture results
+ * using configurable point values from match_settings.
+ */
+export function calcMatchPoints(
+  prediction: MatchPrediction,
+  fixture: Fixture,
+  settings: MatchSettings
+): {
+  teamWinPoints: number;
+  momPoints: number;
+  highestScorerPoints: number;
+  highestWicketTakerPoints: number;
+  total: number;
+} {
+  const teamWinPoints =
+    prediction.predicted_winner_id != null &&
+    prediction.predicted_winner_id === fixture.winning_team_id
+      ? settings.points_team_win
+      : 0;
+
+  const momPoints =
+    prediction.predicted_mom_id != null &&
+    prediction.predicted_mom_id === fixture.mom_player_id
+      ? settings.points_mom
+      : 0;
+
+  const highestScorerPoints =
+    prediction.predicted_highest_scorer_id != null &&
+    prediction.predicted_highest_scorer_id === fixture.highest_scorer_id
+      ? settings.points_highest_scorer
+      : 0;
+
+  const highestWicketTakerPoints =
+    prediction.predicted_highest_wicket_taker_id != null &&
+    prediction.predicted_highest_wicket_taker_id === fixture.highest_wicket_taker_id
+      ? settings.points_highest_wicket_taker
+      : 0;
+
+  return {
+    teamWinPoints,
+    momPoints,
+    highestScorerPoints,
+    highestWicketTakerPoints,
+    total: teamWinPoints + momPoints + highestScorerPoints + highestWicketTakerPoints,
+  };
+}
+
+/**
+ * Checks whether predictions are still open for a fixture.
+ * Predictions close `deadlineMinutes` before the match start time.
+ * Only upcoming fixtures can have open predictions.
+ */
+export function isPredictionOpen(
+  fixture: Fixture,
+  deadlineMinutes: number,
+  now: Date = new Date()
+): boolean {
+  if (fixture.status !== 'upcoming') return false;
+  const deadline = new Date(fixture.match_date);
+  deadline.setMinutes(deadline.getMinutes() - deadlineMinutes);
+  return now < deadline;
 }
