@@ -1,0 +1,38 @@
+[
+  {
+    "id": "lohagad-lions",
+    "name": "Lohagad Lions",
+    "color": "#E67E22",
+    "logo": "/teams/lohagad-lions.png"
+  },
+  {
+    "id": "purandar-gladiators",
+    "name": "Purandar Gladiators",
+    "color": "#8E44AD",
+    "logo": "/teams/purandar-gladiators.png"
+  },
+  {
+    "id": "raigad-rangers",
+    "name": "Raigad Rangers",
+    "color": "#2ECC71",
+    "logo": "/teams/raigad-rangers.png"
+  },
+  {
+    "id": "shivneri-spartans",
+    "name": "Shivneri Spartans",
+    "color": "#E74C3C",
+    "logo": "/teams/shivneri-spartans.png"
+  },
+  {
+    "id": "sindhudurg-stallions",
+    "name": "Sindhudurg Stallions",
+    "color": "#3498DB",
+    "logo": "/teams/sindhudurg-stallions.png"
+  },
+  {
+    "id": "torna-titans",
+    "name": "Torna Titans",
+    "color": "#F1C40F",
+    "logo": "/teams/torna-titans.png"
+  }
+]
