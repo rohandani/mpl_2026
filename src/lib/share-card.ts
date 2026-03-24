@@ -12,6 +12,8 @@ export interface ShareCardData {
   customHashtags?: string[];
   /** Active sponsor names to show on the card */
   sponsorNames?: string[];
+  /** Active sponsor logo URLs */
+  sponsorLogos?: (string | null)[];
   /** e.g. "12 / 20 predicted" */
   predictionsText?: string;
   /** e.g. "195 pts" */
@@ -83,7 +85,7 @@ export async function generateShareCard(data: ShareCardData): Promise<Blob> {
   ctx.fillText('2026', CARD_W / 2 + 80, 250);
 
   // Configurable subtitle
-  const subtitle = data.title ?? 'Auction Predictions';
+  const subtitle = data.title ?? 'Predictions';
   ctx.fillStyle = '#6b7280';
   ctx.font = '32px system-ui, -apple-system, sans-serif';
   ctx.fillText(subtitle, CARD_W / 2, 300);
@@ -179,15 +181,56 @@ export async function generateShareCard(data: ShareCardData): Promise<Blob> {
   ctx.fillText(uniqueHashtags.join('  '), CARD_W / 2, nextY);
   nextY += 50;
 
-  // Sponsors
+  // Sponsors with logos
   if (data.sponsorNames && data.sponsorNames.length > 0) {
     ctx.fillStyle = '#9ca3af';
     ctx.font = '20px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Sponsored by', CARD_W / 2, nextY);
-    ctx.fillStyle = '#374151';
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-    ctx.fillText(data.sponsorNames.join('  ·  '), CARD_W / 2, nextY + 35);
+    nextY += 25;
+
+    const logoSize = 48;
+    const sponsorGap = 40;
+    const sponsorCount = data.sponsorNames.length;
+
+    // Load all sponsor logos in parallel
+    const logoImages: (HTMLImageElement | null)[] = await Promise.all(
+      (data.sponsorLogos ?? []).map(async (url) => {
+        if (!url) return null;
+        try { return await loadImage(url); } catch { return null; }
+      })
+    );
+
+    // Measure total width to center everything
+    ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
+    const sponsorWidths = data.sponsorNames.map((name, i) => {
+      const hasLogo = !!logoImages[i];
+      const textW = ctx.measureText(name).width;
+      return (hasLogo ? logoSize + 10 : 0) + textW;
+    });
+    const totalSponsorW = sponsorWidths.reduce((a, b) => a + b, 0) + (sponsorCount - 1) * sponsorGap;
+    let sx = (CARD_W - totalSponsorW) / 2;
+
+    for (let i = 0; i < sponsorCount; i++) {
+      const logo = logoImages[i];
+      const name = data.sponsorNames[i];
+
+      if (logo) {
+        // Draw logo with rounded clip
+        ctx.save();
+        roundRect(ctx, sx, nextY, logoSize, logoSize, 8);
+        ctx.clip();
+        ctx.drawImage(logo, sx, nextY, logoSize, logoSize);
+        ctx.restore();
+        sx += logoSize + 10;
+      }
+
+      ctx.fillStyle = '#374151';
+      ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(name, sx, nextY + logoSize / 2 + 8);
+      sx += ctx.measureText(name).width + sponsorGap;
+    }
   }
 
   // Bottom accent bar

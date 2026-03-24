@@ -29,7 +29,7 @@ export default async function PredictionsPage() {
     supabase.from('predictions').select('*').eq('user_id', user.id),
     supabase.from('teams').select('*'),
     supabase.from('share_config').select('*').eq('id', 'default').single(),
-    supabase.from('sponsors').select('name').eq('is_active', true).order('display_order'),
+    supabase.from('sponsors').select('name, logo_url').eq('is_active', true).order('display_order'),
   ]);
 
   const auctionMap = new Map(
@@ -53,7 +53,9 @@ export default async function PredictionsPage() {
 
   const config = shareConfig as ShareConfig | null;
 
-  const sponsorNames = ((sponsors as Sponsor[]) ?? []).map((s) => s.name);
+  const activeSponsorList = ((sponsors as Sponsor[]) ?? []);
+  const sponsorNames = activeSponsorList.map((s) => s.name);
+  const sponsorLogos = activeSponsorList.map((s) => s.logo_url);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -64,6 +66,7 @@ export default async function PredictionsPage() {
           title: config?.title,
           customHashtags: config?.hashtags,
           sponsorNames,
+          sponsorLogos,
           predictionsText: `${totalPredicted} / ${totalPlayers}`,
           tagline: 'Think you can beat me? Join now!',
         }}

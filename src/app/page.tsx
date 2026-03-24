@@ -33,6 +33,7 @@ export default async function HomePage() {
           title: config?.title,
           customHashtags: config?.hashtags,
           sponsorNames: activeSponors.map((s) => s.name),
+          sponsorLogos: activeSponors.map((s) => s.logo_url),
         }}
       />
 

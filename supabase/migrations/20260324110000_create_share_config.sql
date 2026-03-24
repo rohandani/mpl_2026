@@ -8,14 +8,14 @@
 
 CREATE TABLE IF NOT EXISTS share_config (
   id TEXT PRIMARY KEY DEFAULT 'default',
-  title TEXT NOT NULL DEFAULT 'Auction Predictions',
+  title TEXT NOT NULL DEFAULT 'Predictions',
   hashtags TEXT[] NOT NULL DEFAULT ARRAY['#CricketAuction']::TEXT[],
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- Seed default row
 INSERT INTO share_config (id, title, hashtags)
-VALUES ('default', 'Auction Predictions', ARRAY['#CricketAuction'])
+VALUES ('default', 'Predictions', ARRAY['#CricketAuction'])
 ON CONFLICT (id) DO NOTHING;
 
 -- RLS

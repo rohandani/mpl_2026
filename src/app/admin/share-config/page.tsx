@@ -13,7 +13,7 @@ export default async function ShareConfigPage() {
 
   const config: ShareConfig = data ?? {
     id: 'default',
-    title: 'Auction Predictions',
+    title: 'Predictions',
     hashtags: ['#CricketAuction'],
     updated_at: new Date().toISOString(),
   };
