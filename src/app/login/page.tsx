@@ -31,13 +31,6 @@ function GoogleIcon() {
   );
 }
 
-function AppleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true">
-      <path d="M14.94 9.88c-.02-2.08 1.7-3.08 1.78-3.13-0.97-1.42-2.48-1.61-3.01-1.63-1.28-.13-2.5.75-3.15.75-.65 0-1.65-.73-2.71-.71-1.4.02-2.68.81-3.4 2.06-1.45 2.52-.37 6.25 1.04 8.3.69 1 1.51 2.12 2.59 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.61.67 2.71.65 1.12-.02 1.83-.98 2.51-2 .79-1.15 1.12-2.26 1.14-2.32-.02-.01-2.18-.84-2.2-3.33ZM12.87 3.54c.57-.7.96-1.66.85-2.63-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.53.92.07 1.86-.47 2.43-1.14Z" />
-    </svg>
-  );
-}
 
 export default async function LoginPage({
   searchParams,
@@ -81,11 +74,6 @@ export default async function LoginPage({
               provider="google"
               icon={<GoogleIcon />}
               label="Continue with Google"
-            />
-            <AuthButton
-              provider="apple"
-              icon={<AppleIcon />}
-              label="Continue with Apple"
             />
 
             {/* Error message */}

@@ -52,6 +52,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Redirect non-admin authenticated users away from /admin routes
+  if (user && request.nextUrl.pathname.startsWith("/admin")) {
+    const isAdmin = user.app_metadata?.role === "admin";
+    if (!isAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return supabaseResponse;
 }
 

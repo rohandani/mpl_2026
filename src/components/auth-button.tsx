@@ -26,7 +26,7 @@ export function AuthButton({ provider, icon, label }: AuthButtonProps) {
     <Button
       variant="outline"
       size="lg"
-      className="w-full min-h-[44px] gap-2 text-sm font-medium"
+      className="w-full min-h-[44px] gap-2 text-sm font-medium cursor-pointer"
       onClick={handleSignIn}
     >
       {icon}
