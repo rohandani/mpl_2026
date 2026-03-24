@@ -7,6 +7,7 @@ export interface Player {
   base_price: number;
   cricheroes_url: string | null;
   is_captain: boolean;
+  team_id: string | null;
   created_at: string;
   updated_at: string;
 }
