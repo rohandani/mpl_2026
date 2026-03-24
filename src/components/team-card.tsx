@@ -3,9 +3,14 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Team } from "@/types/team";
 
-export function TeamCard({ team }: { team: Team }) {
+interface TeamCardProps {
+  team: Team;
+  href: string;
+}
+
+export function TeamCard({ team, href }: TeamCardProps) {
   return (
-    <Link href={`/admin/teams/${team.id}`}>
+    <Link href={href}>
       <Card className="pt-0 transition-shadow hover:shadow-md">
         <div className="h-1.5 rounded-t-xl" style={{ backgroundColor: team.color }} />
         <CardContent className="flex items-center gap-4 pt-2">

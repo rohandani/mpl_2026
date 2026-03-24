@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { isAdmin } from "@/lib/auth/roles";
 import { SignOutButton } from "@/components/sign-out-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -41,23 +41,63 @@ export default async function HomePage() {
 
       {/* Main content */}
       <main className="flex flex-1 items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md border-t-4 border-t-primary">
-          <CardHeader className="items-center text-center">
+        <div className="w-full max-w-2xl space-y-6">
+          {/* Welcome */}
+          <div className="text-center space-y-2">
             <Image
               src="/mpl-logo.png"
               alt="MPL 2026 logo"
-              width={64}
-              height={64}
-              className="mb-2 mx-auto"
+              width={56}
+              height={56}
+              className="mx-auto"
             />
-            <CardTitle className="text-2xl font-bold">
+            <h1 className="text-2xl font-bold">
               Welcome, {displayName}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center text-muted-foreground">
-            <p>Tournament features coming soon. Stay tuned!</p>
-          </CardContent>
-        </Card>
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Predict auction prices, pick teams, and climb the leaderboard.
+            </p>
+          </div>
+
+          {/* Cards */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Link href="/predictions" className="group">
+              <Card className="h-full border-t-4 border-t-emerald-500 transition-shadow group-hover:shadow-md">
+                <CardContent className="space-y-2 pt-4 text-center">
+                  <span className="text-3xl">🎯</span>
+                  <CardTitle className="text-base">Predictions</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    Predict selling prices and buying teams for each player.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/leaderboard" className="group">
+              <Card className="h-full border-t-4 border-t-amber-500 transition-shadow group-hover:shadow-md">
+                <CardContent className="space-y-2 pt-4 text-center">
+                  <span className="text-3xl">🏆</span>
+                  <CardTitle className="text-base">Leaderboard</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    See who's leading the prediction game.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/teams" className="group">
+              <Card className="h-full border-t-4 border-t-blue-500 transition-shadow group-hover:shadow-md">
+                <CardContent className="space-y-2 pt-4 text-center">
+                  <span className="text-3xl">🏏</span>
+                  <CardTitle className="text-base">Teams</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    View all teams and their squads.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
       </main>
     </div>
   );
