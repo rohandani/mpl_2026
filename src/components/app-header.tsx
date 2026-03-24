@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { SignOutButton } from '@/components/sign-out-button';
+import { ShareButton } from '@/components/share-button';
 
 interface AppHeaderProps {
   showAdmin?: boolean;
@@ -34,6 +35,7 @@ export function AppHeader({ showAdmin = false }: AppHeaderProps) {
               {link.label}
             </Link>
           ))}
+          <ShareButton />
           {showAdmin && (
             <Link
               href="/admin"
