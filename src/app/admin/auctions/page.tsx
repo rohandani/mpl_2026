@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { AuctionList } from './auction-list';
+import { PredictionLockToggle } from './prediction-lock-toggle';
 import type { Player } from '@/types/player';
 import type { Team } from '@/types/team';
 import type { Auction } from '@/types/prediction';
@@ -16,6 +17,14 @@ export default async function AuctionsPage() {
   const { data: auctions } = await supabase.from('auctions').select('*');
   const { data: teams } = await supabase.from('teams').select('*');
 
+  const { data: settings } = await supabase
+    .from('app_settings')
+    .select('predictions_locked')
+    .eq('id', 'default')
+    .single();
+
+  const predictionsLocked = settings?.predictions_locked ?? false;
+
   const auctionMap = new Map(
     (auctions ?? []).map((a: Auction) => [a.player_id, a])
   );
@@ -30,6 +39,8 @@ export default async function AuctionsPage() {
 
   return (
     <div className="space-y-6">
+      <PredictionLockToggle initialLocked={predictionsLocked} />
+
       <div>
         <h1 className="text-xl font-semibold">Auction Results</h1>
         <p className="text-sm text-muted-foreground">

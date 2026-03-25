@@ -53,14 +53,26 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link href="/predictions" className="group">
               <Card className="h-full border-t-4 border-t-emerald-500 transition-shadow group-hover:shadow-md">
                 <CardContent className="space-y-2 pt-4 text-center">
                   <span className="text-3xl">🎯</span>
-                  <CardTitle className="text-base">Predictions</CardTitle>
+                  <CardTitle className="text-base">Auction Predictions</CardTitle>
                   <p className="text-xs text-muted-foreground">
                     Predict selling prices and buying teams for each player.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/fixtures" className="group">
+              <Card className="h-full border-t-4 border-t-violet-500 transition-shadow group-hover:shadow-md">
+                <CardContent className="space-y-2 pt-4 text-center">
+                  <span className="text-3xl">📅</span>
+                  <CardTitle className="text-base">Fixture Predictions</CardTitle>
+                  <p className="text-xs text-muted-foreground">
+                    View matches and predict match outcomes.
                   </p>
                 </CardContent>
               </Card>

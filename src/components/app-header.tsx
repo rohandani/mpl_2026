@@ -10,7 +10,8 @@ interface AppHeaderProps {
 }
 
 const NAV_LINKS = [
-  { href: '/predictions', label: '✨ Predictions' },
+  { href: '/predictions', label: '🎯 Auction' },
+  { href: '/fixtures', label: '📅 Fixtures' },
   { href: '/leaderboard', label: '🏆 Leaderboard' },
   { href: '/teams', label: '🏏 Teams' },
 ];

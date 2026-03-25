@@ -24,6 +24,17 @@ export async function submitPrediction(
 
   if (!user) return { success: false, error: 'Not authenticated.' };
 
+  // Check if predictions are globally locked
+  const { data: settings } = await supabase
+    .from('app_settings')
+    .select('predictions_locked')
+    .eq('id', 'default')
+    .maybeSingle();
+
+  if (settings?.predictions_locked) {
+    return { success: false, error: 'Predictions are currently locked.' };
+  }
+
   // Check if auction result is already out for this player
   const { data: auction } = await supabase
     .from('auctions')

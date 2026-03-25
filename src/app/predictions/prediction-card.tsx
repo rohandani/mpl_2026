@@ -12,9 +12,10 @@ import type { Team } from '@/types/team';
 interface Props {
   player: PlayerWithPrediction;
   teams: Team[];
+  predictionsLocked: boolean;
 }
 
-export function PredictionCard({ player, teams }: Props) {
+export function PredictionCard({ player, teams, predictionsLocked }: Props) {
   const hasResult = player.auction?.sold_price != null;
   const hasPrediction = !!player.prediction;
   const [isPending, startTransition] = useTransition();
@@ -137,14 +138,16 @@ export function PredictionCard({ player, teams }: Props) {
               Price: ${player.prediction!.predicted_price} · Team:{' '}
               {predictedTeam?.name ?? '?'}
             </p>
-            <p className="text-[11px] text-muted-foreground">
-              You can update until the result is announced.
-            </p>
+            {!predictionsLocked && (
+              <p className="text-[11px] text-muted-foreground">
+                You can update until the result is announced.
+              </p>
+            )}
           </div>
         )}
 
-        {/* Prediction form (no result yet) */}
-        {!hasResult && (
+        {/* Prediction form (no result yet, not locked) */}
+        {!hasResult && !predictionsLocked && (
           <div className="space-y-2.5 rounded-lg border border-border bg-muted/30 p-3">
             <p className="text-xs font-medium text-muted-foreground">
               {hasPrediction ? 'Update Prediction' : '🎯 Your Prediction'}
