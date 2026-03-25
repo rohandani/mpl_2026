@@ -13,13 +13,14 @@ const ROLES: RoleFilter[] = ['All Roles', 'Batsman', 'Bowler', 'All-Rounder', 'W
 interface Props {
   players: PlayerWithPrediction[];
   teams: Team[];
+  predictionsLocked: boolean;
 }
 
 function hasResult(p: PlayerWithPrediction) {
   return p.auction?.sold_price != null;
 }
 
-export function PredictionsShell({ players, teams }: Props) {
+export function PredictionsShell({ players, teams, predictionsLocked }: Props) {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [role, setRole] = useState<RoleFilter>('All Roles');
@@ -67,6 +68,13 @@ export function PredictionsShell({ players, teams }: Props) {
           Predict the selling price and buying team for each player before the auction!
         </p>
       </div>
+
+      {/* Predictions locked banner */}
+      {predictionsLocked && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          🔒 Predictions are currently closed. You can no longer submit or update predictions.
+        </div>
+      )}
 
       {/* Progress bar */}
       <div className="rounded-xl bg-white p-4 ring-1 ring-border">
@@ -149,6 +157,7 @@ export function PredictionsShell({ players, teams }: Props) {
             key={player.id}
             player={player}
             teams={teams}
+            predictionsLocked={predictionsLocked}
           />
         ))}
         {filtered.length === 0 && (

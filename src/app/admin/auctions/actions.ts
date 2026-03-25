@@ -68,3 +68,27 @@ export async function setPlayerResult(
   revalidatePath('/admin/teams');
   return { success: true };
 }
+
+export async function togglePredictionLock(
+  locked: boolean
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== 'admin') {
+    return { success: false, error: 'Admin access required.' };
+  }
+
+  const { error } = await supabase
+    .from('app_settings')
+    .update({ predictions_locked: locked, updated_at: new Date().toISOString() })
+    .eq('id', 'default');
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath('/predictions');
+  revalidatePath('/admin/auctions');
+  return { success: true };
+}
