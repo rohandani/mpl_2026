@@ -25,7 +25,7 @@ export default async function PredictionsPage() {
     { data: sponsors },
     { data: appSettings },
   ] = await Promise.all([
-    supabase.from('players').select('id, name, role, base_price, is_captain, team_id').eq('is_captain', false).order('name'),
+    supabase.from('players').select('id, name, role, base_price, is_captain, team_id, cricheroes_url').eq('is_captain', false).order('name'),
     supabase.from('auctions').select('*'),
     supabase.from('predictions').select('*').eq('user_id', user.id),
     supabase.from('teams').select('*'),

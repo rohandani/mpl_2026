@@ -26,6 +26,7 @@ export interface PlayerWithPrediction {
   base_price: number;
   is_captain: boolean;
   team_id: string | null;
+  cricheroes_url: string | null;
   auction: Auction | null;
   prediction: Prediction | null;
 }

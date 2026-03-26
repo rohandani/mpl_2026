@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User } from 'lucide-react';
+import { User, ExternalLink } from 'lucide-react';
 import { submitPrediction } from './actions';
 import { calcTotalPoints } from '@/lib/scoring';
 import type { PlayerWithPrediction } from '@/types/prediction';
@@ -82,9 +82,21 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
           )}
         </div>
 
-        <span className="inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium">
-          {player.role}
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="inline-block rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium">
+            {player.role}
+          </span>
+          {player.cricheroes_url && (
+            <a
+              href={player.cricheroes_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+            >
+              CricHeroes <ExternalLink className="size-3" />
+            </a>
+          )}
+        </div>
 
         {error && <p className="text-xs text-destructive">{error}</p>}
 
