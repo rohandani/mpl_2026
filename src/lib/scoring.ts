@@ -56,25 +56,25 @@ export function calcMatchPoints(
 } {
   const teamWinPoints =
     prediction.predicted_winner_id != null &&
-    prediction.predicted_winner_id === fixture.winning_team_id
+      prediction.predicted_winner_id === fixture.winning_team_id
       ? settings.points_team_win
       : 0;
 
   const momPoints =
     prediction.predicted_mom_id != null &&
-    prediction.predicted_mom_id === fixture.mom_player_id
+      prediction.predicted_mom_id === fixture.mom_player_id
       ? settings.points_mom
       : 0;
 
   const highestScorerPoints =
     prediction.predicted_highest_scorer_id != null &&
-    prediction.predicted_highest_scorer_id === fixture.highest_scorer_id
+      prediction.predicted_highest_scorer_id === fixture.highest_scorer_id
       ? settings.points_highest_scorer
       : 0;
 
   const highestWicketTakerPoints =
     prediction.predicted_highest_wicket_taker_id != null &&
-    prediction.predicted_highest_wicket_taker_id === fixture.highest_wicket_taker_id
+      prediction.predicted_highest_wicket_taker_id === fixture.highest_wicket_taker_id
       ? settings.points_highest_wicket_taker
       : 0;
 
