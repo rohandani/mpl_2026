@@ -92,3 +92,30 @@ export async function togglePredictionLock(
   revalidatePath('/admin/auctions');
   return { success: true };
 }
+
+export async function updateAuctionRulesHtml(
+  html: string
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== 'admin') {
+    return { success: false, error: 'Admin access required.' };
+  }
+
+  const { error } = await supabase
+    .from('app_settings')
+    .update({
+      auction_rules_html: html,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', 'default');
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath('/predictions');
+  revalidatePath('/admin/auctions');
+  return { success: true };
+}

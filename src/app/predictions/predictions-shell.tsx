@@ -14,13 +14,14 @@ interface Props {
   players: PlayerWithPrediction[];
   teams: Team[];
   predictionsLocked: boolean;
+  auctionRulesHtml: string;
 }
 
 function hasResult(p: PlayerWithPrediction) {
   return p.auction?.sold_price != null;
 }
 
-export function PredictionsShell({ players, teams, predictionsLocked }: Props) {
+export function PredictionsShell({ players, teams, predictionsLocked, auctionRulesHtml }: Props) {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [role, setRole] = useState<RoleFilter>('All Roles');
@@ -68,6 +69,17 @@ export function PredictionsShell({ players, teams, predictionsLocked }: Props) {
           Predict the selling price and buying team for each player before the auction!
         </p>
       </div>
+
+      {/* Auction rules banner */}
+      {auctionRulesHtml && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 space-y-1">
+          <p className="font-semibold">📋 Auction Rules</p>
+          <div
+            className="prose prose-sm prose-blue max-w-none text-blue-700 [&_ul]:list-disc [&_ul]:list-inside [&_ol]:list-decimal [&_ol]:list-inside [&_li]:my-0.5"
+            dangerouslySetInnerHTML={{ __html: auctionRulesHtml }}
+          />
+        </div>
+      )}
 
       {/* Predictions locked banner */}
       {predictionsLocked && (

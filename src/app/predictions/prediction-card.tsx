@@ -39,11 +39,11 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
   const score =
     hasResult && hasPrediction
       ? calcTotalPoints(
-          player.prediction!.predicted_price,
-          player.prediction!.predicted_team_id,
-          player.auction!.sold_price!,
-          player.auction!.sold_to_team_id!
-        )
+        player.prediction!.predicted_price,
+        player.prediction!.predicted_team_id,
+        player.auction!.sold_price!,
+        player.auction!.sold_to_team_id!
+      )
       : null;
 
   const soldTeam = teams.find((t) => t.id === player.auction?.sold_to_team_id);

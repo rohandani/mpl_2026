@@ -31,10 +31,11 @@ export default async function PredictionsPage() {
     supabase.from('teams').select('*'),
     supabase.from('share_config').select('*').eq('id', 'default').single(),
     supabase.from('sponsors').select('name, logo_url').eq('is_active', true).order('display_order'),
-    supabase.from('app_settings').select('predictions_locked').eq('id', 'default').single(),
+    supabase.from('app_settings').select('predictions_locked, auction_rules_html').eq('id', 'default').single(),
   ]);
 
   const predictionsLocked = appSettings?.predictions_locked ?? false;
+  const auctionRulesHtml = appSettings?.auction_rules_html ?? '';
 
   const auctionMap = new Map(
     (auctions ?? []).map((a: Auction) => [a.player_id, a])
@@ -80,6 +81,7 @@ export default async function PredictionsPage() {
           players={playersWithPredictions}
           teams={(teams as Team[]) ?? []}
           predictionsLocked={predictionsLocked}
+          auctionRulesHtml={auctionRulesHtml}
         />
       </main>
     </div>
