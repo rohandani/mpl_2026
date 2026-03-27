@@ -161,7 +161,7 @@ function PlayerCard({
         </div>
         <div className="flex items-center gap-4 text-sm">
           <span>{preds.length} prediction{preds.length !== 1 ? 's' : ''}</span>
-          <span className="text-muted-foreground">Avg: ₹{avg.toLocaleString()}</span>
+          <span className="text-muted-foreground">Avg: CAD {avg.toLocaleString()}</span>
           <span className="text-xs">{open ? '▲' : '▼'}</span>
         </div>
       </button>
@@ -179,7 +179,7 @@ function PlayerCard({
               {preds.map((p) => (
                 <tr key={p.id} className="border-t border-muted/30">
                   <td className="py-1.5">{p.user_name}</td>
-                  <td className="py-1.5">₹{p.predicted_price.toLocaleString()}</td>
+                  <td className="py-1.5">CAD {p.predicted_price.toLocaleString()}</td>
                   <td className="py-1.5">
                     <span
                       className="inline-block rounded px-2 py-0.5 text-xs text-white"
@@ -235,7 +235,7 @@ function UserCard({
               {group.preds.map((p) => (
                 <tr key={p.id} className="border-t border-muted/30">
                   <td className="py-1.5">{playerMap[p.player_id]?.name ?? p.player_id}</td>
-                  <td className="py-1.5">₹{p.predicted_price.toLocaleString()}</td>
+                  <td className="py-1.5">CAD {p.predicted_price.toLocaleString()}</td>
                   <td className="py-1.5">
                     <span
                       className="inline-block rounded px-2 py-0.5 text-xs text-white"
