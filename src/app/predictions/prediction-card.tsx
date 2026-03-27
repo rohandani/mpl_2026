@@ -22,7 +22,7 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const [price, setPrice] = useState(
-    player.prediction?.predicted_price?.toString() ?? ''
+    player.prediction?.predicted_price?.toString() ?? player.base_price.toString()
   );
   const [teamId, setTeamId] = useState(
     player.prediction?.predicted_team_id ?? ''
@@ -42,7 +42,7 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
         player.prediction!.predicted_price,
         player.prediction!.predicted_team_id,
         player.auction!.sold_price!,
-        player.auction!.sold_to_team_id!
+        player.auction!.sold_to_team_id!,
       )
       : null;
 
@@ -120,9 +120,7 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 space-y-1">
             <div className="flex items-center gap-1.5">
               <span className="text-emerald-600">✅</span>
-              <p className="text-sm font-semibold text-emerald-800">
-                Your Prediction
-              </p>
+              <p className="text-sm font-semibold text-emerald-800">Your Prediction</p>
             </div>
             <p className="text-sm">
               Price: ${player.prediction!.predicted_price} · Team:{' '}
@@ -142,9 +140,7 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 space-y-1">
             <div className="flex items-center gap-1.5">
               <span className="text-emerald-600">✅</span>
-              <p className="text-sm font-semibold text-emerald-800">
-                Your Prediction
-              </p>
+              <p className="text-sm font-semibold text-emerald-800">Your Prediction</p>
             </div>
             <p className="text-sm">
               Price: ${player.prediction!.predicted_price} · Team:{' '}
@@ -168,14 +164,42 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
               <label className="text-xs text-muted-foreground">
                 Predicted selling price (CAD)
               </label>
-              <input
-                type="number"
-                min={0}
-                placeholder="e.g. 1200"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="h-8 w-full rounded-lg border border-border bg-white px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
-              />
+              <div className="flex items-center gap-2">
+                <span className="h-8 flex-1 flex items-center rounded-lg border border-border bg-white px-3 text-sm font-medium">
+                  ${Number(price).toLocaleString()}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPrice(player.base_price.toString())}
+                  className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-muted transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
+              <div className="flex gap-1.5">
+                {[1000, 2000, 5000].map((step) => (
+                  <button
+                    key={`minus-${step}`}
+                    type="button"
+                    onClick={() =>
+                      setPrice(String(Math.max(player.base_price, Number(price) - step)))
+                    }
+                    className="flex-1 rounded-md border border-red-200 bg-red-50 px-2 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 transition-colors"
+                  >
+                    −{step / 1000}k
+                  </button>
+                ))}
+                {[1000, 2000, 5000].map((step) => (
+                  <button
+                    key={`plus-${step}`}
+                    type="button"
+                    onClick={() => setPrice(String(Number(price) + step))}
+                    className="flex-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition-colors"
+                  >
+                    +{step / 1000}k
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">

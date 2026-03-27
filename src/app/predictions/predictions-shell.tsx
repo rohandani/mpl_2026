@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import type { PlayerWithPrediction } from '@/types/prediction';
 import type { Team } from '@/types/team';
 import { PredictionCard } from './prediction-card';
+import { BulkPredictionForm } from './bulk-prediction-form';
 
 type StatusFilter = 'all' | 'not-predicted' | 'predicted' | 'results';
 type RoleFilter = 'All Roles' | 'Batsman' | 'Bowler' | 'All-Rounder' | 'Wicket-Keeper';
@@ -25,6 +26,7 @@ export function PredictionsShell({ players, teams, predictionsLocked, auctionRul
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [role, setRole] = useState<RoleFilter>('All Roles');
+  const [bulkMode, setBulkMode] = useState(false);
 
   const counts = useMemo(() => {
     const all = players.length;
@@ -104,6 +106,27 @@ export function PredictionsShell({ players, teams, predictionsLocked, auctionRul
         </div>
       </div>
 
+      {/* Mode toggle */}
+      {!predictionsLocked && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => setBulkMode(!bulkMode)}
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+              bulkMode
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-white text-muted-foreground ring-1 ring-border hover:bg-muted'
+            }`}
+          >
+            {bulkMode ? '← Single Mode' : '⚡ Bulk Predict'}
+          </button>
+        </div>
+      )}
+
+      {/* Bulk mode */}
+      {bulkMode && !predictionsLocked ? (
+        <BulkPredictionForm players={players} teams={teams} />
+      ) : (
+      <>
       {/* Search */}
       <input
         type="text"
@@ -178,6 +201,8 @@ export function PredictionsShell({ players, teams, predictionsLocked, auctionRul
           </p>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }
