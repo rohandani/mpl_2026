@@ -12,6 +12,7 @@ const tabs = [
   { label: "Predictions", href: "/admin/predictions" },
   { label: "Sponsors", href: "/admin/sponsors" },
   { label: "Share Config", href: "/admin/share-config" },
+  { label: "Heatmap", href: "/auction-heatmap" },
 ];
 
 export function AdminNav() {
