@@ -9,9 +9,13 @@ import { calcTotalPoints } from '@/lib/scoring';
 import type { PlayerWithPrediction } from '@/types/prediction';
 import type { Team } from '@/types/team';
 
+interface TeamWithCaptain extends Team {
+  captain_name: string | null;
+}
+
 interface Props {
   player: PlayerWithPrediction;
-  teams: Team[];
+  teams: TeamWithCaptain[];
   predictionsLocked: boolean;
 }
 
@@ -213,7 +217,7 @@ export function PredictionCard({ player, teams, predictionsLocked }: Props) {
                 <option value="">Select team</option>
                 {teams.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.name}
+                    {t.name}{t.captain_name ? ` (${t.captain_name})` : ''}
                   </option>
                 ))}
               </select>

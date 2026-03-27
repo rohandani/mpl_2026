@@ -37,7 +37,6 @@ export default async function AdminPredictionsPage() {
 
   // Collect unique user IDs and fetch their profiles
   const userIds = [...new Set((predictions ?? []).map((p: PredictionRow) => p.user_id))];
-  console.log(userIds)
   const { data: profiles } = await supabase
     .from('profiles')
     .select('id, display_name')

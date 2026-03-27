@@ -59,7 +59,6 @@ export function PredictionsBrowser({ predictions, players, teams }: Props) {
 
   const byUser = useMemo(() => {
     const grouped: Record<string, { name: string; preds: EnrichedPrediction[] }> = {};
-    console.log(grouped)
     for (const p of predictions) {
       if (!grouped[p.user_id]) grouped[p.user_id] = { name: p.user_name, preds: [] };
       grouped[p.user_id].preds.push(p);

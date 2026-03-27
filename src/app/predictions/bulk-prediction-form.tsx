@@ -6,9 +6,13 @@ import { submitBulkPredictions } from './actions';
 import type { PlayerWithPrediction } from '@/types/prediction';
 import type { Team } from '@/types/team';
 
+interface TeamWithCaptain extends Team {
+  captain_name: string | null;
+}
+
 interface Props {
   players: PlayerWithPrediction[];
-  teams: Team[];
+  teams: TeamWithCaptain[];
 }
 
 interface BulkEntry {
@@ -151,7 +155,7 @@ export function BulkPredictionForm({ players, teams }: Props) {
                       <option value="">Select</option>
                       {teams.map((t) => (
                         <option key={t.id} value={t.id}>
-                          {t.name}
+                          {t.name}{t.captain_name ? ` (${t.captain_name})` : ''}
                         </option>
                       ))}
                     </select>

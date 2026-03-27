@@ -11,9 +11,13 @@ type RoleFilter = 'All Roles' | 'Batsman' | 'Bowler' | 'All-Rounder' | 'Wicket-K
 
 const ROLES: RoleFilter[] = ['All Roles', 'Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];
 
+interface TeamWithCaptain extends Team {
+  captain_name: string | null;
+}
+
 interface Props {
   players: PlayerWithPrediction[];
-  teams: Team[];
+  teams: TeamWithCaptain[];
   predictionsLocked: boolean;
   auctionRulesHtml: string;
 }
@@ -111,11 +115,10 @@ export function PredictionsShell({ players, teams, predictionsLocked, auctionRul
         <div className="flex justify-end">
           <button
             onClick={() => setBulkMode(!bulkMode)}
-            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-              bulkMode
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${bulkMode
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-white text-muted-foreground ring-1 ring-border hover:bg-muted'
-            }`}
+              }`}
           >
             {bulkMode ? '← Single Mode' : '⚡ Bulk Predict'}
           </button>
@@ -126,82 +129,79 @@ export function PredictionsShell({ players, teams, predictionsLocked, auctionRul
       {bulkMode && !predictionsLocked ? (
         <BulkPredictionForm players={players} teams={teams} />
       ) : (
-      <>
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search players..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="h-10 w-full rounded-xl border border-border bg-white px-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
-      />
-
-      {/* Status filter tabs */}
-      <div className="flex flex-wrap gap-2">
-        {statusTabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setStatus(tab.key)}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              status === tab.key
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-white text-muted-foreground ring-1 ring-border hover:bg-muted'
-            }`}
-          >
-            <span>{tab.icon}</span>
-            {tab.label}
-            <span
-              className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-                status === tab.key
-                  ? 'bg-primary-foreground/20 text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              {tab.count}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Role filter pills */}
-      <div className="flex flex-wrap gap-2">
-        {ROLES.map((r) => (
-          <button
-            key={r}
-            onClick={() => setRole(r)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-              role === r
-                ? 'bg-emerald-100 text-emerald-800'
-                : 'bg-white text-muted-foreground ring-1 ring-border hover:bg-muted'
-            }`}
-          >
-            {r}
-          </button>
-        ))}
-      </div>
-
-      {/* Count */}
-      <p className="text-sm text-muted-foreground">
-        ✨ Showing {filtered.length} of {players.length} players
-      </p>
-
-      {/* Player grid */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {filtered.map((player) => (
-          <PredictionCard
-            key={player.id}
-            player={player}
-            teams={teams}
-            predictionsLocked={predictionsLocked}
+        <>
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search players..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-10 w-full rounded-xl border border-border bg-white px-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
           />
-        ))}
-        {filtered.length === 0 && (
-          <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
-            No players match your filters.
+
+          {/* Status filter tabs */}
+          <div className="flex flex-wrap gap-2">
+            {statusTabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setStatus(tab.key)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${status === tab.key
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-white text-muted-foreground ring-1 ring-border hover:bg-muted'
+                  }`}
+              >
+                <span>{tab.icon}</span>
+                {tab.label}
+                <span
+                  className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${status === tab.key
+                      ? 'bg-primary-foreground/20 text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                    }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Role filter pills */}
+          <div className="flex flex-wrap gap-2">
+            {ROLES.map((r) => (
+              <button
+                key={r}
+                onClick={() => setRole(r)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${role === r
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : 'bg-white text-muted-foreground ring-1 ring-border hover:bg-muted'
+                  }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+
+          {/* Count */}
+          <p className="text-sm text-muted-foreground">
+            ✨ Showing {filtered.length} of {players.length} players
           </p>
-        )}
-      </div>
-      </>
+
+          {/* Player grid */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {filtered.map((player) => (
+              <PredictionCard
+                key={player.id}
+                player={player}
+                teams={teams}
+                predictionsLocked={predictionsLocked}
+              />
+            ))}
+            {filtered.length === 0 && (
+              <p className="col-span-full py-12 text-center text-sm text-muted-foreground">
+                No players match your filters.
+              </p>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

@@ -7,7 +7,6 @@ import type { PlayerWithPrediction, Auction } from '@/types/prediction';
 import type { Team } from '@/types/team';
 import type { ShareConfig } from '@/types/share-config';
 import type { Sponsor } from '@/types/sponsor';
-
 export default async function PredictionsPage() {
   const supabase = await createClient();
   const {
@@ -21,6 +20,7 @@ export default async function PredictionsPage() {
     { data: auctions },
     { data: predictions },
     { data: teams },
+    { data: captains },
     { data: shareConfig },
     { data: sponsors },
     { data: appSettings },
@@ -29,6 +29,7 @@ export default async function PredictionsPage() {
     supabase.from('auctions').select('*'),
     supabase.from('predictions').select('*').eq('user_id', user.id),
     supabase.from('teams').select('*'),
+    supabase.from('players').select('name, team_id').eq('is_captain', true),
     supabase.from('share_config').select('*').eq('id', 'default').single(),
     supabase.from('sponsors').select('name, logo_url').eq('is_active', true).order('display_order'),
     supabase.from('app_settings').select('predictions_locked, auction_rules_html').eq('id', 'default').single(),
@@ -36,6 +37,15 @@ export default async function PredictionsPage() {
 
   const predictionsLocked = appSettings?.predictions_locked ?? false;
   const auctionRulesHtml = appSettings?.auction_rules_html ?? '';
+
+  const captainMap = new Map(
+    (captains ?? []).map((c: { name: string; team_id: string | null }) => [c.team_id, c.name])
+  );
+
+  const teamsWithCaptains = ((teams as Team[]) ?? []).map((t) => ({
+    ...t,
+    captain_name: captainMap.get(t.id) ?? null,
+  }));
 
   const auctionMap = new Map(
     (auctions ?? []).map((a: Auction) => [a.player_id, a])
@@ -79,7 +89,7 @@ export default async function PredictionsPage() {
       <main className="flex-1 px-4 py-6">
         <PredictionsShell
           players={playersWithPredictions}
-          teams={(teams as Team[]) ?? []}
+          teams={teamsWithCaptains}
           predictionsLocked={predictionsLocked}
           auctionRulesHtml={auctionRulesHtml}
         />
