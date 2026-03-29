@@ -102,20 +102,28 @@ function TableWrapper({ children }: { children: React.ReactNode }) {
 
 function PlayerCell({
   name,
-  userId,
   isCurrentUser,
 }: {
   name: string;
-  userId: string;
   isCurrentUser: boolean;
 }) {
   return (
     <td className="py-3">
-      <Link
-        href={`/scores?user=${userId}&name=${encodeURIComponent(name)}`}
-        className={`font-semibold hover:text-primary hover:underline ${isCurrentUser ? 'text-foreground' : ''}`}
-      >
+      <span className={`font-semibold ${isCurrentUser ? 'text-foreground' : ''}`}>
         {name}
+      </span>
+    </td>
+  );
+}
+
+function ViewScoresCell({ userId, name }: { userId: string; name: string }) {
+  return (
+    <td className="py-3 pr-4 text-right">
+      <Link
+        href={`/scores?user=${userId}&name=${encodeURIComponent(name)}&from=leaderboard`}
+        className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+      >
+        View 📊
       </Link>
     </td>
   );
@@ -136,6 +144,7 @@ function AuctionTable({
           <th className="py-3 text-left font-medium text-muted-foreground">Player</th>
           <th className="py-3 text-center font-medium text-muted-foreground">Predictions</th>
           <th className="w-24 py-3 pr-4 text-right font-medium text-muted-foreground">Score</th>
+          <th className="w-20 py-3 pr-4" />
         </tr>
       </thead>
       <tbody>
@@ -149,13 +158,14 @@ function AuctionTable({
               }`}
             >
               <RankCell index={i} />
-              <PlayerCell name={entry.display_name} userId={entry.user_id} isCurrentUser={isCurrentUser} />
+              <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
               <td className="py-3 text-center text-muted-foreground">
                 {entry.predictions_count}
               </td>
               <td className="py-3 pr-4 text-right">
                 <span className="font-bold text-primary">{entry.total_points}</span>
               </td>
+              <ViewScoresCell userId={entry.user_id} name={entry.display_name} />
             </tr>
           );
         })}
@@ -179,6 +189,7 @@ function MatchesTable({
           <th className="py-3 text-left font-medium text-muted-foreground">Player</th>
           <th className="py-3 text-center font-medium text-muted-foreground">Matches</th>
           <th className="w-24 py-3 pr-4 text-right font-medium text-muted-foreground">Score</th>
+          <th className="w-20 py-3 pr-4" />
         </tr>
       </thead>
       <tbody>
@@ -192,13 +203,14 @@ function MatchesTable({
               }`}
             >
               <RankCell index={i} />
-              <PlayerCell name={entry.display_name} userId={entry.user_id} isCurrentUser={isCurrentUser} />
+              <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
               <td className="py-3 text-center text-muted-foreground">
                 {entry.matches_predicted}
               </td>
               <td className="py-3 pr-4 text-right">
                 <span className="font-bold text-primary">{entry.total_points}</span>
               </td>
+              <ViewScoresCell userId={entry.user_id} name={entry.display_name} />
             </tr>
           );
         })}
@@ -238,6 +250,7 @@ function OverallTable({
             <th className="py-3 text-center font-medium text-muted-foreground">Auction</th>
             <th className="py-3 text-center font-medium text-muted-foreground">Matches</th>
             <th className="w-24 py-3 pr-4 text-right font-medium text-muted-foreground">Total</th>
+            <th className="w-20 py-3 pr-4" />
           </tr>
         </thead>
         <tbody>
@@ -251,7 +264,7 @@ function OverallTable({
                 }`}
               >
                 <RankCell index={i} />
-                <PlayerCell name={entry.display_name} userId={entry.user_id} isCurrentUser={isCurrentUser} />
+                <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
                 <td className="py-3 text-center text-muted-foreground">
                   {entry.auction_points}
                 </td>
@@ -261,6 +274,7 @@ function OverallTable({
                 <td className="py-3 pr-4 text-right">
                   <span className="font-bold text-primary">{entry.total_points}</span>
                 </td>
+                <ViewScoresCell userId={entry.user_id} name={entry.display_name} />
               </tr>
             );
           })}

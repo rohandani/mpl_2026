@@ -24,7 +24,7 @@ export interface ScoreRow {
 }
 
 interface Props {
-  searchParams: Promise<{ user?: string; name?: string }>;
+  searchParams: Promise<{ user?: string; name?: string; from?: string }>;
 }
 
 export default async function ScoresPage({ searchParams }: Props) {
@@ -39,6 +39,7 @@ export default async function ScoresPage({ searchParams }: Props) {
   const targetUserId = params.user || user.id;
   const isOwnScores = targetUserId === user.id;
   const displayName = params.name || user.user_metadata?.full_name || user.email || 'You';
+  const fromLeaderboard = params.from === 'leaderboard';
 
   // If viewing another user's scores, use the RPC (bypasses RLS)
   // If viewing own scores, use direct queries (faster, no RPC needed)
@@ -152,7 +153,7 @@ export default async function ScoresPage({ searchParams }: Props) {
       <AppHeader showAdmin={isAdmin(user)} />
       <main className="flex-1 px-4 py-6">
         <div className="mx-auto max-w-5xl space-y-4">
-          {!isOwnScores && (
+          {fromLeaderboard && (
             <Link
               href="/leaderboard"
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
