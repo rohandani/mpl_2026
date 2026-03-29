@@ -44,8 +44,18 @@ export function TeamRoster({ team, players }: TeamRosterProps) {
                 style={{ backgroundColor: team.color }}
               />
               <CardContent className="flex items-center gap-3 pt-2">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted">
-                  <User className="size-4 text-muted-foreground" />
+                <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">
+                  {player.photo_url ? (
+                    <Image
+                      src={player.photo_url}
+                      alt={player.name}
+                      width={32}
+                      height={32}
+                      className="size-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="size-4 text-muted-foreground" />
+                  )}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">

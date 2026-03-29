@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type {
   AuctionLeaderboardEntry,
   MatchesLeaderboardEntry,
@@ -101,16 +102,21 @@ function TableWrapper({ children }: { children: React.ReactNode }) {
 
 function PlayerCell({
   name,
+  userId,
   isCurrentUser,
 }: {
   name: string;
+  userId: string;
   isCurrentUser: boolean;
 }) {
   return (
     <td className="py-3">
-      <span className={`font-semibold ${isCurrentUser ? 'text-foreground' : ''}`}>
+      <Link
+        href={`/scores?user=${userId}&name=${encodeURIComponent(name)}`}
+        className={`font-semibold hover:text-primary hover:underline ${isCurrentUser ? 'text-foreground' : ''}`}
+      >
         {name}
-      </span>
+      </Link>
     </td>
   );
 }
@@ -143,7 +149,7 @@ function AuctionTable({
               }`}
             >
               <RankCell index={i} />
-              <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
+              <PlayerCell name={entry.display_name} userId={entry.user_id} isCurrentUser={isCurrentUser} />
               <td className="py-3 text-center text-muted-foreground">
                 {entry.predictions_count}
               </td>
@@ -186,7 +192,7 @@ function MatchesTable({
               }`}
             >
               <RankCell index={i} />
-              <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
+              <PlayerCell name={entry.display_name} userId={entry.user_id} isCurrentUser={isCurrentUser} />
               <td className="py-3 text-center text-muted-foreground">
                 {entry.matches_predicted}
               </td>
@@ -245,7 +251,7 @@ function OverallTable({
                 }`}
               >
                 <RankCell index={i} />
-                <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
+                <PlayerCell name={entry.display_name} userId={entry.user_id} isCurrentUser={isCurrentUser} />
                 <td className="py-3 text-center text-muted-foreground">
                   {entry.auction_points}
                 </td>

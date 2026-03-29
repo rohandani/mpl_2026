@@ -18,6 +18,7 @@ export interface RacePlayer {
     rank: number;
     name: string;
     role: string;
+    photo_url: string | null;
     predicted_team: string;
     team_color: string;
     prediction_count: number;
@@ -37,7 +38,7 @@ export default async function AuctionHeatmapPage() {
     const [predRes, captainRes] = await Promise.all([
         supabase
             .from('predictions')
-            .select('player_id, predicted_price, predicted_team_id, player:players(name, role)'),
+            .select('player_id, predicted_price, predicted_team_id, player:players(name, role, photo_url)'),
         supabase
             .from('players')
             .select('name, team_id')
@@ -63,6 +64,7 @@ export default async function AuctionHeatmapPage() {
         {
             name: string;
             role: string;
+            photo_url: string | null;
             totalPredicted: number;
             count: number;
             teamVotes: Map<string, number>;
@@ -70,7 +72,7 @@ export default async function AuctionHeatmapPage() {
     >();
 
     for (const row of predictions ?? []) {
-        const player = row.player as unknown as { name: string; role: string } | null;
+        const player = row.player as unknown as { name: string; role: string; photo_url: string | null } | null;
         const existing = playerAgg.get(row.player_id);
         if (existing) {
             existing.totalPredicted += row.predicted_price;
@@ -85,6 +87,7 @@ export default async function AuctionHeatmapPage() {
             playerAgg.set(row.player_id, {
                 name: player?.name ?? 'Unknown',
                 role: player?.role ?? '',
+                photo_url: player?.photo_url ?? null,
                 totalPredicted: row.predicted_price,
                 count: 1,
                 teamVotes: votes,
@@ -129,6 +132,7 @@ export default async function AuctionHeatmapPage() {
             rank: i + 1,
             name: p.name,
             role: p.role,
+            photo_url: p.photo_url,
             predicted_team: team?.name ?? 'Unknown',
             team_color: team?.color ?? '#94a3b8',
             prediction_count: p.count,

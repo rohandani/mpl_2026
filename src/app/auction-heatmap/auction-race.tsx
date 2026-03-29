@@ -59,19 +59,29 @@ export function AuctionRace({ players }: Props) {
           >
             {/* Player header */}
             <div className="flex items-center gap-3 mb-3">
-              <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  i === 0
-                    ? 'bg-amber-200 text-amber-800'
-                    : i === 1
-                      ? 'bg-slate-200 text-slate-700'
-                      : i === 2
-                        ? 'bg-orange-200 text-orange-800'
-                        : 'bg-gray-200 text-gray-600'
-                }`}
-              >
-                {player.rank}
-              </span>
+              {player.photo_url ? (
+                <Image
+                  src={player.photo_url}
+                  alt={player.name}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-white"
+                />
+              ) : (
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                    i === 0
+                      ? 'bg-amber-200 text-amber-800'
+                      : i === 1
+                        ? 'bg-slate-200 text-slate-700'
+                        : i === 2
+                          ? 'bg-orange-200 text-orange-800'
+                          : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {player.rank}
+                </span>
+              )}
               <div>
                 <span className="font-bold text-base">{player.name}</span>
                 <span className="ml-2 text-xs text-muted-foreground">
