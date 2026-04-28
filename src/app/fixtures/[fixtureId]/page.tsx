@@ -69,6 +69,7 @@ export default async function FixtureDetailPage({ params }: Props) {
     highest_scorer_points: number;
     highest_wicket_taker_points: number;
     total_points: number;
+    submitted_at: string;
   }[] = [];
 
   if (f.status === 'completed') {

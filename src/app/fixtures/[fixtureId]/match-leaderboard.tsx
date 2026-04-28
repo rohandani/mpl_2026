@@ -11,6 +11,7 @@ interface LeaderboardEntry {
   highest_scorer_points: number;
   highest_wicket_taker_points: number;
   total_points: number;
+  submitted_at: string;
 }
 
 interface Props {
@@ -86,6 +87,9 @@ export function MatchLeaderboard({
                 <th className="w-20 py-2 pr-4 text-right font-medium text-muted-foreground">
                   Total
                 </th>
+                <th className="py-2 pr-4 text-right font-medium text-muted-foreground text-xs">
+                  Submitted
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -127,6 +131,14 @@ export function MatchLeaderboard({
                     </td>
                     <td className="py-2 pr-4 text-right">
                       <span className="font-bold text-primary">{entry.total_points}</span>
+                    </td>
+                    <td className="py-2 pr-4 text-right text-xs text-muted-foreground whitespace-nowrap">
+                      {new Date(entry.submitted_at).toLocaleString([], {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </td>
                   </tr>
                 );

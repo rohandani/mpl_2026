@@ -294,6 +294,22 @@ function PredictionSummary({
           <p>🎳 Highest Wicket Taker: {playerMap.get(prediction.predicted_highest_wicket_taker_id)?.name ?? '—'}</p>
         )}
       </div>
+      <p className="text-[11px] text-muted-foreground pt-1">
+        Submitted {new Date(prediction.created_at).toLocaleString([], {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })}
+        {prediction.updated_at !== prediction.created_at && (
+          <> · Updated {new Date(prediction.updated_at).toLocaleString([], {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}</>
+        )}
+      </p>
     </div>
   );
 }

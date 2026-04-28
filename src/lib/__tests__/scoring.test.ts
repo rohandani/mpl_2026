@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { calcMatchPoints, isPredictionOpen } from '@/lib/scoring';
+import {
+  calcPricePoints,
+  calcTotalPoints,
+  calcMatchPoints,
+  isPredictionOpen,
+  TEAM_POINTS,
+  MAX_PRICE_POINTS,
+} from '@/lib/scoring';
 import type { Fixture, MatchPrediction, MatchSettings } from '@/types/fixture';
+
+// ─── Match scoring helpers ───────────────────────────────────
 
 const defaultSettings: MatchSettings = {
   id: 'default',
@@ -42,6 +51,84 @@ function makePrediction(overrides: Partial<MatchPrediction> = {}): MatchPredicti
     ...overrides,
   };
 }
+
+// ─── Auction price scoring ───────────────────────────────────
+
+describe('calcPricePoints', () => {
+  it('returns 30 for an exact price match', () => {
+    expect(calcPricePoints(5000, 5000)).toBe(30);
+  });
+
+  it('returns 20 for 10% off', () => {
+    // 10% off → 30 - 10 = 20
+    expect(calcPricePoints(4500, 5000)).toBe(20);
+    expect(calcPricePoints(5500, 5000)).toBe(20);
+  });
+
+  it('returns 10 for 20% off', () => {
+    expect(calcPricePoints(4000, 5000)).toBe(10);
+  });
+
+  it('returns 0 for 30% or more off', () => {
+    expect(calcPricePoints(3500, 5000)).toBe(0);
+    expect(calcPricePoints(7000, 5000)).toBe(0);
+  });
+
+  it('returns 0 when predicted is wildly off', () => {
+    expect(calcPricePoints(50000, 1000)).toBe(0);
+  });
+
+  it('handles actual price of 0 — exact match gives full points', () => {
+    expect(calcPricePoints(0, 0)).toBe(30);
+  });
+
+  it('handles actual price of 0 — any non-zero prediction gives 0', () => {
+    expect(calcPricePoints(100, 0)).toBe(0);
+  });
+
+  it('handles small prices correctly', () => {
+    // predicted 900, actual 1000 → 10% off → 20 pts
+    expect(calcPricePoints(900, 1000)).toBe(20);
+  });
+
+  it('caps at MAX_PRICE_POINTS and never goes negative', () => {
+    const result = calcPricePoints(1000, 1000);
+    expect(result).toBeLessThanOrEqual(MAX_PRICE_POINTS);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('calcTotalPoints', () => {
+  it('awards team + price points when both correct', () => {
+    const result = calcTotalPoints(5000, 'team-a', 5000, 'team-a');
+    expect(result.teamPoints).toBe(TEAM_POINTS); // 20
+    expect(result.pricePoints).toBe(30);
+    expect(result.total).toBe(50);
+  });
+
+  it('awards only price points when team is wrong', () => {
+    const result = calcTotalPoints(5000, 'team-a', 5000, 'team-b');
+    expect(result.teamPoints).toBe(0);
+    expect(result.pricePoints).toBe(30);
+    expect(result.total).toBe(30);
+  });
+
+  it('awards only team points when price is way off', () => {
+    const result = calcTotalPoints(50000, 'team-a', 1000, 'team-a');
+    expect(result.teamPoints).toBe(TEAM_POINTS);
+    expect(result.pricePoints).toBe(0);
+    expect(result.total).toBe(20);
+  });
+
+  it('awards 0 when both wrong', () => {
+    const result = calcTotalPoints(50000, 'team-a', 1000, 'team-b');
+    expect(result.teamPoints).toBe(0);
+    expect(result.pricePoints).toBe(0);
+    expect(result.total).toBe(0);
+  });
+});
+
+// ─── Match prediction scoring ────────────────────────────────
 
 describe('calcMatchPoints', () => {
   it('awards full points when all predictions are correct', () => {
@@ -118,7 +205,86 @@ describe('calcMatchPoints', () => {
     const result = calcMatchPoints(prediction, completedFixture, customSettings);
     expect(result.total).toBe(80);
   });
+
+  it('does not award points when fixture result fields are null', () => {
+    const noResultFixture: Fixture = {
+      ...completedFixture,
+      winning_team_id: null,
+      mom_player_id: null,
+      highest_scorer_id: null,
+      highest_wicket_taker_id: null,
+    };
+    const prediction = makePrediction({
+      predicted_winner_id: 'team-a',
+      predicted_mom_id: 'player-1',
+      predicted_highest_scorer_id: 'player-2',
+      predicted_highest_wicket_taker_id: 'player-3',
+    });
+    const result = calcMatchPoints(prediction, noResultFixture, defaultSettings);
+    expect(result.total).toBe(0);
+  });
+
+  it('does not award points when both prediction and result are null (no false positive)', () => {
+    const noResultFixture: Fixture = {
+      ...completedFixture,
+      winning_team_id: null,
+      mom_player_id: null,
+      highest_scorer_id: null,
+      highest_wicket_taker_id: null,
+    };
+    const prediction = makePrediction(); // all nulls
+    const result = calcMatchPoints(prediction, noResultFixture, defaultSettings);
+    expect(result.total).toBe(0);
+  });
+
+  it('handles zero-point settings gracefully', () => {
+    const zeroSettings: MatchSettings = {
+      ...defaultSettings,
+      points_team_win: 0,
+      points_mom: 0,
+      points_highest_scorer: 0,
+      points_highest_wicket_taker: 0,
+    };
+    const prediction = makePrediction({
+      predicted_winner_id: 'team-a',
+      predicted_mom_id: 'player-1',
+      predicted_highest_scorer_id: 'player-2',
+      predicted_highest_wicket_taker_id: 'player-3',
+    });
+    const result = calcMatchPoints(prediction, zeroSettings as unknown as Fixture, zeroSettings);
+    // Even all correct, 0-point settings = 0 total
+    expect(calcMatchPoints(prediction, completedFixture, zeroSettings).total).toBe(0);
+  });
+
+  it('awards only MoM points when only MoM is correct', () => {
+    const prediction = makePrediction({
+      predicted_winner_id: 'team-b',
+      predicted_mom_id: 'player-1',
+      predicted_highest_scorer_id: 'player-wrong',
+      predicted_highest_wicket_taker_id: 'player-wrong',
+    });
+    const result = calcMatchPoints(prediction, completedFixture, defaultSettings);
+    expect(result.teamWinPoints).toBe(0);
+    expect(result.momPoints).toBe(15);
+    expect(result.highestScorerPoints).toBe(0);
+    expect(result.highestWicketTakerPoints).toBe(0);
+    expect(result.total).toBe(15);
+  });
+
+  it('awards only highest wicket taker points when only that is correct', () => {
+    const prediction = makePrediction({
+      predicted_winner_id: 'team-b',
+      predicted_mom_id: 'player-wrong',
+      predicted_highest_scorer_id: 'player-wrong',
+      predicted_highest_wicket_taker_id: 'player-3',
+    });
+    const result = calcMatchPoints(prediction, completedFixture, defaultSettings);
+    expect(result.total).toBe(10);
+    expect(result.highestWicketTakerPoints).toBe(10);
+  });
 });
+
+// ─── Prediction deadline ─────────────────────────────────────
 
 describe('isPredictionOpen', () => {
   const upcomingFixture: Fixture = {
@@ -157,5 +323,15 @@ describe('isPredictionOpen', () => {
     const now = new Date('2026-04-01T13:20:00Z'); // 40 min before match
     expect(isPredictionOpen(upcomingFixture, 30, now)).toBe(true); // deadline at 13:30
     expect(isPredictionOpen(upcomingFixture, 45, now)).toBe(false); // deadline at 13:15
+  });
+
+  it('returns true when deadline is 0 minutes and time is before match', () => {
+    const now = new Date('2026-04-01T13:59:59Z');
+    expect(isPredictionOpen(upcomingFixture, 0, now)).toBe(true);
+  });
+
+  it('returns false when deadline is 0 minutes and time is at match start', () => {
+    const now = new Date('2026-04-01T14:00:00Z');
+    expect(isPredictionOpen(upcomingFixture, 0, now)).toBe(false);
   });
 });
