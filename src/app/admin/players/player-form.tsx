@@ -4,17 +4,19 @@ import { useRef, useState, useTransition } from 'react';
 import { addPlayer, updatePlayer } from './actions';
 import { Button } from '@/components/ui/button';
 import type { Player, PlayerRole } from '@/types/player';
+import type { Team } from '@/types/team';
 
 const ROLES: PlayerRole[] = ['Batsman', 'Bowler', 'All-Rounder', 'Wicket-Keeper'];
 
 interface PlayerFormProps {
   mode?: 'add' | 'edit';
   player?: Player;
+  teams?: Team[];
   onCancel?: () => void;
   onSuccess?: () => void;
 }
 
-export function PlayerForm({ mode = 'add', player, onCancel, onSuccess }: PlayerFormProps) {
+export function PlayerForm({ mode = 'add', player, teams = [], onCancel, onSuccess }: PlayerFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -96,6 +98,21 @@ export function PlayerForm({ mode = 'add', player, onCancel, onSuccess }: Player
             placeholder="https://cricheroes.com/..."
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
           />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="team_id" className="text-sm font-medium">Team</label>
+          <select
+            id="team_id"
+            name="team_id"
+            defaultValue={player?.team_id ?? ''}
+            className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
+          >
+            <option value="">No team (unassigned)</option>
+            {teams.map((team) => (
+              <option key={team.id} value={team.id}>{team.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 

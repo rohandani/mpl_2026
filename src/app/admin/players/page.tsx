@@ -2,22 +2,24 @@ import { createClient } from '@/lib/supabase/server';
 import { PlayerForm } from './player-form';
 import { PlayerList } from './player-list';
 import type { Player } from '@/types/player';
+import type { Team } from '@/types/team';
 
 export default async function PlayersPage() {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('players')
-    .select('*')
-    .order('created_at', { ascending: true });
+  const [{ data, error }, { data: teamsData }] = await Promise.all([
+    supabase.from('players').select('*').order('created_at', { ascending: true }),
+    supabase.from('teams').select('*'),
+  ]);
 
   const players: Player[] = data ?? [];
+  const teams: Team[] = teamsData ?? [];
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="mb-3 text-lg font-semibold">Add Player</h2>
         <div className="rounded-xl border border-border bg-card p-4">
-          <PlayerForm />
+          <PlayerForm teams={teams} />
         </div>
       </div>
 

@@ -32,6 +32,7 @@ export async function addPlayer(formData: FormData): Promise<ActionResult> {
   const base_price = basePriceRaw ? Number(basePriceRaw) : NaN;
   const cricheroes_url = (formData.get('cricheroes_url') as string) || null;
   const is_captain = formData.get('is_captain') === 'on';
+  const team_id = (formData.get('team_id') as string) || null;
 
   const validationError = validatePlayerInput({ name: name ?? undefined, role: role ?? undefined, base_price });
   if (validationError) {
@@ -45,6 +46,7 @@ export async function addPlayer(formData: FormData): Promise<ActionResult> {
     base_price,
     cricheroes_url: cricheroes_url?.trim() || null,
     is_captain,
+    team_id,
   });
 
   if (error) {
@@ -66,6 +68,7 @@ export async function updatePlayer(id: string, formData: FormData): Promise<Acti
   const base_price = basePriceRaw ? Number(basePriceRaw) : NaN;
   const cricheroes_url = (formData.get('cricheroes_url') as string) || null;
   const is_captain = formData.get('is_captain') === 'on';
+  const team_id = (formData.get('team_id') as string) || null;
 
   const validationError = validatePlayerInput({ name: name ?? undefined, role: role ?? undefined, base_price });
   if (validationError) {
@@ -81,6 +84,7 @@ export async function updatePlayer(id: string, formData: FormData): Promise<Acti
       base_price,
       cricheroes_url: cricheroes_url?.trim() || null,
       is_captain,
+      team_id,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id);
