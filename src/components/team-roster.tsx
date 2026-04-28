@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { User } from "lucide-react";
+import { ExternalLink, User } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Team } from "@/types/team";
 import type { Player } from "@/types/player";
@@ -7,9 +7,10 @@ import type { Player } from "@/types/player";
 interface TeamRosterProps {
   team: Team;
   players: Player[];
+  soldPriceMap?: Record<string, number>;
 }
 
-export function TeamRoster({ team, players }: TeamRosterProps) {
+export function TeamRoster({ team, players, soldPriceMap = {} }: TeamRosterProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
@@ -67,9 +68,20 @@ export function TeamRoster({ team, players }: TeamRosterProps) {
                         C
                       </span>
                     )}
+                    {player.cricheroes_url && (
+                      <a
+                        href={player.cricheroes_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 text-muted-foreground hover:text-foreground"
+                        aria-label={`${player.name} CricHeroes profile`}
+                      >
+                        <ExternalLink className="size-3" />
+                      </a>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {player.role} · ${player.base_price}
+                    {player.role} · ${soldPriceMap[player.id] ?? player.base_price}
                   </p>
                 </div>
               </CardContent>
