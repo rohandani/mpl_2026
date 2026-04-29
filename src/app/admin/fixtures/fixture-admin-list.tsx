@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { FixtureForm } from './fixture-form';
 import { FixtureResultForm } from './fixture-result-form';
+import { togglePredictionLock } from './actions';
 import type { Fixture } from '@/types/fixture';
 import type { Team } from '@/types/team';
 import type { Player } from '@/types/player';
@@ -18,8 +19,15 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const teamMap = new Map(teams.map((t) => [t.id, t]));
+
+  function handleToggleLock(fixtureId: string, currentlyLocked: boolean) {
+    startTransition(async () => {
+      await togglePredictionLock(fixtureId, !currentlyLocked);
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -73,7 +81,14 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
                     </td>
                     <td className="py-2.5 text-muted-foreground">{f.venue ?? '—'}</td>
                     <td className="py-2.5">
-                      <StatusBadge status={f.status} />
+                      <span className="flex items-center gap-1">
+                        <StatusBadge status={f.status} />
+                        {f.predictions_locked && f.status !== 'completed' && (
+                          <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700">
+                            🔒
+                          </span>
+                        )}
+                      </span>
                     </td>
                     <td className="py-2.5 pr-4 text-right space-x-1">
                       {f.status !== 'completed' && (
@@ -91,6 +106,14 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
                             onClick={() => { setResultId(isResult ? null : f.id); setEditingId(null); setShowCreate(false); }}
                           >
                             {isResult ? 'Cancel' : 'Result'}
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant={f.predictions_locked ? 'destructive' : 'outline'}
+                            disabled={isPending}
+                            onClick={() => handleToggleLock(f.id, f.predictions_locked)}
+                          >
+                            {f.predictions_locked ? '🔒 Unlock' : '🔓 Lock'}
                           </Button>
                         </>
                       )}

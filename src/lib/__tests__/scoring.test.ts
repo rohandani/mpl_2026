@@ -33,6 +33,7 @@ const completedFixture: Fixture = {
   mom_player_id: 'player-1',
   highest_scorer_id: 'player-2',
   highest_wicket_taker_id: 'player-3',
+  predictions_locked: false,
   created_at: '2026-03-01T00:00:00Z',
   updated_at: '2026-03-01T00:00:00Z',
 };
@@ -333,5 +334,11 @@ describe('isPredictionOpen', () => {
   it('returns false when deadline is 0 minutes and time is at match start', () => {
     const now = new Date('2026-04-01T14:00:00Z');
     expect(isPredictionOpen(upcomingFixture, 0, now)).toBe(false);
+  });
+
+  it('returns false when predictions are manually locked by admin', () => {
+    const lockedFixture: Fixture = { ...upcomingFixture, predictions_locked: true };
+    const now = new Date('2026-04-01T13:00:00Z'); // well before deadline
+    expect(isPredictionOpen(lockedFixture, 15, now)).toBe(false);
   });
 });

@@ -98,6 +98,7 @@ export function isPredictionOpen(
   now: Date = new Date()
 ): boolean {
   if (fixture.status !== 'upcoming') return false;
+  if (fixture.predictions_locked) return false;
   const deadline = new Date(fixture.match_date);
   deadline.setMinutes(deadline.getMinutes() - deadlineMinutes);
   return now < deadline;

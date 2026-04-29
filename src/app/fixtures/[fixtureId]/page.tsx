@@ -70,6 +70,10 @@ export default async function FixtureDetailPage({ params }: Props) {
     highest_wicket_taker_points: number;
     total_points: number;
     submitted_at: string;
+    predicted_winner_id: string | null;
+    predicted_mom_id: string | null;
+    predicted_highest_scorer_id: string | null;
+    predicted_highest_wicket_taker_id: string | null;
   }[] = [];
 
   if (f.status === 'completed') {
@@ -112,13 +116,12 @@ export default async function FixtureDetailPage({ params }: Props) {
                   Match #{f.match_number}
                 </span>
                 <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    f.status === 'completed'
-                      ? 'bg-amber-100 text-amber-800'
-                      : f.status === 'live'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-blue-100 text-blue-800'
-                  }`}
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${f.status === 'completed'
+                    ? 'bg-amber-100 text-amber-800'
+                    : f.status === 'live'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-blue-100 text-blue-800'
+                    }`}
                 >
                   {f.status.charAt(0).toUpperCase() + f.status.slice(1)}
                 </span>
@@ -203,6 +206,8 @@ export default async function FixtureDetailPage({ params }: Props) {
               prediction={(prediction as MatchPrediction) ?? null}
               fixture={f}
               settings={matchSettings}
+              teams={teamsList}
+              players={teamPlayers}
             />
           )}
         </div>

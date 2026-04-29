@@ -127,3 +127,34 @@ export async function submitFixtureResult(
   revalidatePath('/leaderboard');
   return { success: true };
 }
+
+export async function togglePredictionLock(
+  fixtureId: string,
+  locked: boolean
+): Promise<ActionResult> {
+  if (!fixtureId) {
+    return { success: false, error: 'Fixture ID is required.' };
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || user.app_metadata?.role !== 'admin') {
+    return { success: false, error: 'Admin access required.' };
+  }
+
+  const { error } = await supabase
+    .from('fixtures')
+    .update({
+      predictions_locked: locked,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', fixtureId);
+
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath('/admin/fixtures');
+  revalidatePath('/fixtures');
+  revalidatePath(`/fixtures/${fixtureId}`);
+  return { success: true };
+}

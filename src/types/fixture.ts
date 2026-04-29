@@ -10,6 +10,7 @@ export interface Fixture {
   mom_player_id: string | null;
   highest_scorer_id: string | null;
   highest_wicket_taker_id: string | null;
+  predictions_locked: boolean;
   created_at: string;
   updated_at: string;
 }
