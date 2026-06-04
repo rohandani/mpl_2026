@@ -60,9 +60,8 @@ export default async function LeaderboardPage() {
 
   if (!user) redirect('/login');
 
-  const [auctionRes, overallRes, matchDetailsRes, teamsRes, playersRes] = await Promise.all([
+  const [auctionRes, matchDetailsRes, teamsRes, playersRes] = await Promise.all([
     supabase.rpc('get_leaderboard'),
-    supabase.rpc('get_overall_leaderboard'),
     supabase.rpc('get_all_user_match_details'),
     supabase.from('teams').select('*'),
     supabase.from('players').select('id, name, role, team_id').order('name'),
@@ -70,15 +69,13 @@ export default async function LeaderboardPage() {
 
   const auctionEntries: AuctionLeaderboardEntry[] =
     (auctionRes.data as AuctionLeaderboardEntry[]) ?? [];
-  const overallEntries: OverallLeaderboardEntry[] =
-    (overallRes.data as OverallLeaderboardEntry[]) ?? [];
   const matchDetails: UserMatchDetail[] =
     (matchDetailsRes.data as UserMatchDetail[]) ?? [];
   const teams: Team[] = (teamsRes.data as Team[]) ?? [];
   const players: Pick<Player, 'id' | 'name' | 'role' | 'team_id'>[] =
     (playersRes.data as Pick<Player, 'id' | 'name' | 'role' | 'team_id'>[]) ?? [];
 
-  const hasError = auctionRes.error || overallRes.error;
+  const hasError = auctionRes.error;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -90,7 +87,6 @@ export default async function LeaderboardPage() {
           )}
           <LeaderboardTable
             auctionEntries={auctionEntries}
-            overallEntries={overallEntries}
             currentUserId={user.id}
             matchDetails={matchDetails}
             teams={teams}

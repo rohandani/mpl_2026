@@ -5,17 +5,15 @@ import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 import type {
   AuctionLeaderboardEntry,
-  OverallLeaderboardEntry,
   UserMatchDetail,
 } from './page';
 import type { Team } from '@/types/team';
 import type { Player } from '@/types/player';
 
-type Tab = 'auction' | 'matches' | 'overall';
+type Tab = 'auction' | 'matches';
 
 interface Props {
   auctionEntries: AuctionLeaderboardEntry[];
-  overallEntries: OverallLeaderboardEntry[];
   currentUserId: string;
   matchDetails: UserMatchDetail[];
   teams: Team[];
@@ -27,18 +25,16 @@ const RANK_ICONS = ['🥇', '🥈', '🥉'];
 const TABS: { key: Tab; label: string }[] = [
   { key: 'auction', label: 'Auction' },
   { key: 'matches', label: 'Matches' },
-  { key: 'overall', label: 'Overall' },
 ];
 
 export function LeaderboardTable({
   auctionEntries,
-  overallEntries,
   currentUserId,
   matchDetails,
   teams,
   players,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<Tab>('overall');
+  const [activeTab, setActiveTab] = useState<Tab>('auction');
 
   return (
     <div className="space-y-6">
@@ -54,6 +50,20 @@ export function LeaderboardTable({
           </p>
         </div>
       </div>
+
+      {/* Auction Winner */}
+      {auctionEntries.length > 0 && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+          <span className="text-2xl">👑</span>
+          <div>
+            <p className="text-sm text-muted-foreground">Auction Champion</p>
+            <p className="font-bold">{auctionEntries[0].display_name}</p>
+          </div>
+          <span className="ml-auto text-lg font-bold text-primary">
+            {auctionEntries[0].total_points} pts
+          </span>
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div className="flex gap-1 rounded-lg bg-muted p-1">
@@ -83,9 +93,6 @@ export function LeaderboardTable({
           teams={teams}
           players={players}
         />
-      )}
-      {activeTab === 'overall' && (
-        <OverallTable entries={overallEntries} currentUserId={currentUserId} />
       )}
     </div>
   );
@@ -265,6 +272,7 @@ function MatchesTable({
             <div>
               {match.users.map((entry, i) => {
                 const isCurrentUser = entry.user_id === currentUserId;
+                const isWinner = i === 0; // First user is the match winner
                 const key = `${fixtureId}-${entry.user_id}`;
                 const isExpanded = expandedKey === key;
 
@@ -274,7 +282,11 @@ function MatchesTable({
                       type="button"
                       onClick={() => setExpandedKey(isExpanded ? null : key)}
                       className={`w-full grid grid-cols-[2rem_1fr_3rem_1.25rem] gap-2 px-4 py-2.5 text-sm text-left transition-colors ${
-                        isCurrentUser ? 'bg-amber-50' : 'hover:bg-muted/30'
+                        isCurrentUser
+                          ? 'bg-amber-50'
+                          : isWinner
+                            ? 'bg-emerald-50'
+                            : 'hover:bg-muted/30'
                       } ${isExpanded ? 'bg-muted/20' : ''}`}
                       aria-expanded={isExpanded}
                     >
@@ -286,14 +298,25 @@ function MatchesTable({
                         )}
                       </span>
                       <span className="truncate">
-                        <span className={`font-semibold ${isCurrentUser ? 'text-foreground' : ''}`}>
+                        <span
+                          className={`font-semibold ${
+                            isCurrentUser ? 'text-foreground' : isWinner ? 'text-emerald-700' : ''
+                          }`}
+                        >
                           {entry.display_name}
                         </span>
                         {isCurrentUser && (
                           <span className="ml-1 text-xs text-muted-foreground">(you)</span>
                         )}
+                        {isWinner && !isCurrentUser && (
+                          <span className="ml-1 text-xs text-emerald-600 font-medium">👑 Winner</span>
+                        )}
                       </span>
-                      <span className="text-right font-bold text-primary">
+                      <span
+                        className={`text-right font-bold ${
+                          isWinner ? 'text-emerald-600' : 'text-primary'
+                        }`}
+                      >
                         {entry.total_points}
                       </span>
                       <ChevronDown
@@ -364,70 +387,5 @@ function PredictionLine({
         )}
       </div>
     </div>
-  );
-}
-
-function OverallTable({
-  entries,
-  currentUserId,
-}: {
-  entries: OverallLeaderboardEntry[];
-  currentUserId: string;
-}) {
-  const leader = entries.length > 0 ? entries[0] : null;
-
-  return (
-    <>
-      {leader && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-          <span className="text-2xl">👑</span>
-          <div>
-            <p className="text-sm text-muted-foreground">Tournament Leader</p>
-            <p className="font-bold">{leader.display_name}</p>
-          </div>
-          <span className="ml-auto text-lg font-bold text-primary">
-            {leader.total_points} pts
-          </span>
-        </div>
-      )}
-      <TableWrapper>
-        <thead>
-          <tr className="border-b border-border bg-muted/40">
-            <th className="w-14 py-3 pl-4 text-left font-medium text-muted-foreground">#</th>
-            <th className="py-3 text-left font-medium text-muted-foreground">Player</th>
-            <th className="py-3 text-center font-medium text-muted-foreground">Auction</th>
-            <th className="py-3 text-center font-medium text-muted-foreground">Matches</th>
-            <th className="w-24 py-3 pr-4 text-right font-medium text-muted-foreground">Total</th>
-            <th className="w-20 py-3 pr-4" />
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry, i) => {
-            const isCurrentUser = entry.user_id === currentUserId;
-            return (
-              <tr
-                key={entry.user_id}
-                className={`border-b border-border last:border-0 transition-colors ${
-                  isCurrentUser ? 'bg-amber-50' : 'hover:bg-muted/30'
-                }`}
-              >
-                <RankCell index={i} />
-                <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
-                <td className="py-3 text-center text-muted-foreground">
-                  {entry.auction_points}
-                </td>
-                <td className="py-3 text-center text-muted-foreground">
-                  {entry.match_points}
-                </td>
-                <td className="py-3 pr-4 text-right">
-                  <span className="font-bold text-primary">{entry.total_points}</span>
-                </td>
-                <ViewScoresCell userId={entry.user_id} name={entry.display_name} />
-              </tr>
-            );
-          })}
-        </tbody>
-      </TableWrapper>
-    </>
   );
 }
