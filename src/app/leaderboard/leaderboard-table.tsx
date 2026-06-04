@@ -2,19 +2,24 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 import type {
   AuctionLeaderboardEntry,
-  MatchesLeaderboardEntry,
   OverallLeaderboardEntry,
+  UserMatchDetail,
 } from './page';
+import type { Team } from '@/types/team';
+import type { Player } from '@/types/player';
 
 type Tab = 'auction' | 'matches' | 'overall';
 
 interface Props {
   auctionEntries: AuctionLeaderboardEntry[];
-  matchesEntries: MatchesLeaderboardEntry[];
   overallEntries: OverallLeaderboardEntry[];
   currentUserId: string;
+  matchDetails: UserMatchDetail[];
+  teams: Team[];
+  players: Pick<Player, 'id' | 'name' | 'role' | 'team_id'>[];
 }
 
 const RANK_ICONS = ['🥇', '🥈', '🥉'];
@@ -27,9 +32,11 @@ const TABS: { key: Tab; label: string }[] = [
 
 export function LeaderboardTable({
   auctionEntries,
-  matchesEntries,
   overallEntries,
   currentUserId,
+  matchDetails,
+  teams,
+  players,
 }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('overall');
 
@@ -70,7 +77,12 @@ export function LeaderboardTable({
         <AuctionTable entries={auctionEntries} currentUserId={currentUserId} />
       )}
       {activeTab === 'matches' && (
-        <MatchesTable entries={matchesEntries} currentUserId={currentUserId} />
+        <MatchesTable
+          currentUserId={currentUserId}
+          matchDetails={matchDetails}
+          teams={teams}
+          players={players}
+        />
       )}
       {activeTab === 'overall' && (
         <OverallTable entries={overallEntries} currentUserId={currentUserId} />
@@ -175,47 +187,183 @@ function AuctionTable({
 }
 
 function MatchesTable({
-  entries,
+  matchDetails,
   currentUserId,
+  teams,
+  players,
 }: {
-  entries: MatchesLeaderboardEntry[];
+  matchDetails: UserMatchDetail[];
   currentUserId: string;
+  teams: Team[];
+  players: Pick<Player, 'id' | 'name' | 'role' | 'team_id'>[];
+}) {
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
+
+  const teamMap = new Map(teams.map((t) => [t.id, t]));
+  const playerMap = new Map(players.map((p) => [p.id, p]));
+
+  // Group by fixture, preserving match_number order from the RPC
+  const matchesMap = new Map<
+    string,
+    { match_number: number; team_a_id: string; team_b_id: string; match_date: string; users: UserMatchDetail[] }
+  >();
+  for (const d of matchDetails) {
+    if (!matchesMap.has(d.fixture_id)) {
+      matchesMap.set(d.fixture_id, {
+        match_number: d.match_number,
+        team_a_id: d.team_a_id,
+        team_b_id: d.team_b_id,
+        match_date: d.match_date,
+        users: [],
+      });
+    }
+    matchesMap.get(d.fixture_id)!.users.push(d);
+  }
+
+  // Sort matches by match_number, users already sorted by total_points DESC from RPC
+  const matches = Array.from(matchesMap.entries()).sort(
+    (a, b) => a[1].match_number - b[1].match_number
+  );
+
+  if (matches.length === 0) {
+    return (
+      <div className="rounded-xl ring-1 ring-border p-6 text-center text-sm text-muted-foreground">
+        No completed match predictions yet.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {matches.map(([fixtureId, match]) => {
+        const teamA = teamMap.get(match.team_a_id);
+        const teamB = teamMap.get(match.team_b_id);
+
+        return (
+          <div key={fixtureId} className="overflow-hidden rounded-xl ring-1 ring-border">
+            <div className="h-1.5 bg-gradient-to-r from-amber-400 via-emerald-500 to-emerald-700" />
+            <div className="px-4 py-3 bg-muted/30 border-b border-border">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Match #{match.match_number}
+                  </span>
+                  <span className="text-sm font-semibold">
+                    {teamA?.name ?? '?'} vs {teamB?.name ?? '?'}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(match.match_date).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                  })}
+                </span>
+              </div>
+            </div>
+
+            {/* Users ranked by score */}
+            <div>
+              {match.users.map((entry, i) => {
+                const isCurrentUser = entry.user_id === currentUserId;
+                const key = `${fixtureId}-${entry.user_id}`;
+                const isExpanded = expandedKey === key;
+
+                return (
+                  <div key={entry.user_id} className="border-b border-border last:border-0">
+                    <button
+                      type="button"
+                      onClick={() => setExpandedKey(isExpanded ? null : key)}
+                      className={`w-full grid grid-cols-[2rem_1fr_3rem_1.25rem] gap-2 px-4 py-2.5 text-sm text-left transition-colors ${
+                        isCurrentUser ? 'bg-amber-50' : 'hover:bg-muted/30'
+                      } ${isExpanded ? 'bg-muted/20' : ''}`}
+                      aria-expanded={isExpanded}
+                    >
+                      <span>
+                        {i < 3 ? (
+                          <span className="text-base">{RANK_ICONS[i]}</span>
+                        ) : (
+                          <span className="text-muted-foreground">{i + 1}</span>
+                        )}
+                      </span>
+                      <span className="truncate">
+                        <span className={`font-semibold ${isCurrentUser ? 'text-foreground' : ''}`}>
+                          {entry.display_name}
+                        </span>
+                        {isCurrentUser && (
+                          <span className="ml-1 text-xs text-muted-foreground">(you)</span>
+                        )}
+                      </span>
+                      <span className="text-right font-bold text-primary">
+                        {entry.total_points}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-muted-foreground transition-transform duration-200 self-center ${isExpanded ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {isExpanded && (
+                      <div className="px-4 py-3 bg-muted/10 border-t border-border space-y-1.5">
+                        <PredictionLine
+                          label="🏆 Winner"
+                          predicted={teamMap.get(entry.predicted_winner_id ?? '')?.name ?? null}
+                          actual={teamMap.get(entry.winning_team_id ?? '')?.name ?? '—'}
+                          correct={entry.team_win_points > 0}
+                        />
+                        <PredictionLine
+                          label="⭐ MoM"
+                          predicted={playerMap.get(entry.predicted_mom_id ?? '')?.name ?? null}
+                          actual={playerMap.get(entry.mom_player_id ?? '')?.name ?? '—'}
+                          correct={entry.mom_points > 0}
+                        />
+                        <PredictionLine
+                          label="🏏 Top Scorer"
+                          predicted={playerMap.get(entry.predicted_highest_scorer_id ?? '')?.name ?? null}
+                          actual={playerMap.get(entry.highest_scorer_id ?? '')?.name ?? '—'}
+                          correct={entry.highest_scorer_points > 0}
+                        />
+                        <PredictionLine
+                          label="🎳 Top Wickets"
+                          predicted={playerMap.get(entry.predicted_highest_wicket_taker_id ?? '')?.name ?? null}
+                          actual={playerMap.get(entry.highest_wicket_taker_id ?? '')?.name ?? '—'}
+                          correct={entry.highest_wicket_taker_points > 0}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PredictionLine({
+  label,
+  predicted,
+  actual,
+  correct,
+}: {
+  label: string;
+  predicted: string | null;
+  actual: string;
+  correct: boolean;
 }) {
   return (
-    <TableWrapper>
-      <thead>
-        <tr className="border-b border-border bg-muted/40">
-          <th className="w-14 py-3 pl-4 text-left font-medium text-muted-foreground">#</th>
-          <th className="py-3 text-left font-medium text-muted-foreground">Player</th>
-          <th className="py-3 text-center font-medium text-muted-foreground">Matches</th>
-          <th className="w-24 py-3 pr-4 text-right font-medium text-muted-foreground">Score</th>
-          <th className="w-20 py-3 pr-4" />
-        </tr>
-      </thead>
-      <tbody>
-        {entries.map((entry, i) => {
-          const isCurrentUser = entry.user_id === currentUserId;
-          return (
-            <tr
-              key={entry.user_id}
-              className={`border-b border-border last:border-0 transition-colors ${
-                isCurrentUser ? 'bg-amber-50' : 'hover:bg-muted/30'
-              }`}
-            >
-              <RankCell index={i} />
-              <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
-              <td className="py-3 text-center text-muted-foreground">
-                {entry.matches_predicted}
-              </td>
-              <td className="py-3 pr-4 text-right">
-                <span className="font-bold text-primary">{entry.total_points}</span>
-              </td>
-              <ViewScoresCell userId={entry.user_id} name={entry.display_name} />
-            </tr>
-          );
-        })}
-      </tbody>
-    </TableWrapper>
+    <div className="flex items-start gap-1.5 text-xs">
+      <span className={correct ? 'text-emerald-500' : 'text-red-400'}>
+        {correct ? '✅' : '❌'}
+      </span>
+      <div className="flex-1 min-w-0">
+        <span className="text-muted-foreground">{label}: </span>
+        <span className="font-medium">{predicted ?? '—'}</span>
+        {!correct && predicted && (
+          <span className="text-muted-foreground"> → {actual}</span>
+        )}
+      </div>
+    </div>
   );
 }
 
