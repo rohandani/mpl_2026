@@ -118,7 +118,7 @@ function FixtureCard({
     >
       {/* Top row: match number, date, status badge */}
       <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
-        <span>Match #{fixture.match_number}</span>
+        <span>{fixture.stage}</span>
         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}>
           {badge.label}
         </span>

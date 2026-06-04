@@ -53,7 +53,7 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40">
-                <th className="py-2.5 pl-4 text-left font-medium text-muted-foreground">#</th>
+                <th className="py-2.5 pl-4 text-left font-medium text-muted-foreground">Stage</th>
                 <th className="py-2.5 text-left font-medium text-muted-foreground">Teams</th>
                 <th className="py-2.5 text-left font-medium text-muted-foreground">Date</th>
                 <th className="py-2.5 text-left font-medium text-muted-foreground">Venue</th>
@@ -70,7 +70,7 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
 
                 return (
                   <tr key={f.id} className="border-b border-border last:border-0">
-                    <td className="py-2.5 pl-4 font-medium">{f.match_number}</td>
+                    <td className="py-2.5 pl-4 font-medium">{f.stage}</td>
                     <td className="py-2.5">
                       {teamA?.name ?? f.team_a_id} vs {teamB?.name ?? f.team_b_id}
                     </td>

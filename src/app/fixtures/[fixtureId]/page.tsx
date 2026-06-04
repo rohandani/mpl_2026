@@ -127,7 +127,7 @@ export default async function FixtureDetailPage({ params }: Props) {
             <div className="p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">
-                  Match #{f.match_number}
+                  {f.stage}
                 </span>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${f.status === 'completed'

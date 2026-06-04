@@ -24,6 +24,7 @@ export function FixtureForm({ teams, fixture, onDone }: Props) {
   const [teamBId, setTeamBId] = useState(fixture?.team_b_id ?? '');
   const [matchDate, setMatchDate] = useState(fixture ? toDatetimeLocal(fixture.match_date) : '');
   const [venue, setVenue] = useState(fixture?.venue ?? '');
+  const [stage, setStage] = useState(fixture?.stage ?? 'Group Stage');
   const [status, setStatus] = useState<Fixture['status']>(fixture?.status ?? 'upcoming');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -41,10 +42,11 @@ export function FixtureForm({ teams, fixture, onDone }: Props) {
           team_b_id: teamBId,
           match_date: new Date(matchDate).toISOString(),
           venue: venue.trim() || null,
+          stage,
           status,
         });
       } else {
-        res = await createFixture(teamAId, teamBId, new Date(matchDate).toISOString(), venue.trim() || null);
+        res = await createFixture(teamAId, teamBId, new Date(matchDate).toISOString(), venue.trim() || null, stage);
       }
       if (!res.success) {
         setError(res.error);
@@ -84,6 +86,17 @@ export function FixtureForm({ teams, fixture, onDone }: Props) {
           onChange={(e) => setMatchDate(e.target.value)}
           className={inputClass}
         />
+      </label>
+
+      <label className="space-y-1">
+        <span className="text-xs font-medium text-muted-foreground">Stage</span>
+        <select value={stage} onChange={(e) => setStage(e.target.value)} className={inputClass}>
+          <option value="Group Stage">Group Stage</option>
+          <option value="Quarter Final">Quarter Final</option>
+          <option value="Semi Final">Semi Final</option>
+          <option value="Third Place">Third Place</option>
+          <option value="Final">Final</option>
+        </select>
       </label>
 
       <label className="space-y-1">

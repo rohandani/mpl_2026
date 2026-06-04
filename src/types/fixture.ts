@@ -5,6 +5,7 @@ export interface Fixture {
   team_b_id: string;
   match_date: string;
   venue: string | null;
+  stage: string;
   status: 'upcoming' | 'live' | 'completed';
   winning_team_id: string | null;
   mom_player_id: string | null;

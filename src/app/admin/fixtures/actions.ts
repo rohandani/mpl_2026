@@ -9,7 +9,8 @@ export async function createFixture(
   teamAId: string,
   teamBId: string,
   matchDate: string,
-  venue: string | null
+  venue: string | null,
+  stage: string = 'Group Stage'
 ): Promise<ActionResult> {
   if (!teamAId || !teamBId) {
     return { success: false, error: 'Both teams are required.' };
@@ -33,6 +34,7 @@ export async function createFixture(
     team_b_id: teamBId,
     match_date: matchDate,
     venue: venue?.trim() || null,
+    stage,
   });
 
   if (error) return { success: false, error: error.message };
@@ -49,6 +51,7 @@ export async function updateFixture(
     team_b_id?: string;
     match_date?: string;
     venue?: string | null;
+    stage?: string;
     status?: 'upcoming' | 'live' | 'completed';
   }
 ): Promise<ActionResult> {

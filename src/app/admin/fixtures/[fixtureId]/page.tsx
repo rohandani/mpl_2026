@@ -60,7 +60,7 @@ export default async function AdminFixtureDetailPage({ params }: Props) {
             </Link>
             <div>
               <h1 className="text-2xl font-bold">
-                Match #{fixture.match_number}: {teamA?.name} vs {teamB?.name}
+                {fixture.stage}: {teamA?.name} vs {teamB?.name}
               </h1>
               <p className="text-muted-foreground">
                 Manage players to watch and match highlights
