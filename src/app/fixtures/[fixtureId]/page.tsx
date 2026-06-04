@@ -4,11 +4,13 @@ import { createClient } from '@/lib/supabase/server';
 import { isAdmin } from '@/lib/auth/roles';
 import { isPredictionOpen } from '@/lib/scoring';
 import { AppHeader } from '@/components/app-header';
+import { HistoricalInsights } from '@/components/historical-insights';
 import { MatchPredictionForm } from './match-prediction-form';
 import { MatchLeaderboard } from './match-leaderboard';
 import type { Fixture, MatchPrediction, MatchSettings } from '@/types/fixture';
 import type { Team } from '@/types/team';
 import type { Player } from '@/types/player';
+import type { PlayerToWatch } from '@/types/player-to-watch';
 import Image from 'next/image';
 
 interface Props {
@@ -29,6 +31,8 @@ export default async function FixtureDetailPage({ params }: Props) {
     { data: teams },
     { data: prediction },
     { data: settings },
+    { data: allFixtures },
+    { data: playersToWatch },
   ] = await Promise.all([
     supabase.from('fixtures').select('*').eq('id', fixtureId).single(),
     supabase.from('teams').select('*'),
@@ -39,12 +43,22 @@ export default async function FixtureDetailPage({ params }: Props) {
       .eq('fixture_id', fixtureId)
       .maybeSingle(),
     supabase.from('match_settings').select('*').eq('id', 'default').single(),
+    supabase.from('fixtures').select('*').eq('status', 'completed').order('match_date', { ascending: false }),
+    supabase
+      .from('players_to_watch')
+      .select(`
+        *,
+        player:players(id, name, role, team_id)
+      `)
+      .eq('fixture_id', fixtureId)
+      .order('sort_order'),
   ]);
 
   if (!fixture) notFound();
 
   const f = fixture as Fixture;
   const teamsList = (teams as Team[]) ?? [];
+  const completedFixtures = (allFixtures as Fixture[]) ?? [];
   const teamA = teamsList.find((t) => t.id === f.team_a_id);
   const teamB = teamsList.find((t) => t.id === f.team_b_id);
   const matchSettings = settings as MatchSettings;
@@ -184,6 +198,17 @@ export default async function FixtureDetailPage({ params }: Props) {
               )}
             </div>
           </div>
+
+          {/* Historical Insights (for upcoming fixtures) */}
+          {f.status === 'upcoming' && (
+            <HistoricalInsights
+              currentFixture={f}
+              teams={teamsList}
+              players={teamPlayers}
+              completedFixtures={completedFixtures}
+              playersToWatch={(playersToWatch as any[]) ?? []}
+            />
+          )}
 
           {/* Prediction form (for non-completed fixtures) */}
           {f.status !== 'completed' && (

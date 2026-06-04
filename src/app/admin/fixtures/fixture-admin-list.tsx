@@ -91,6 +91,14 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
                       </span>
                     </td>
                     <td className="py-2.5 pr-4 text-right space-x-1">
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        onClick={() => window.open(`/admin/fixtures/${f.id}`, '_blank')}
+                        title="Manage Players to Watch"
+                      >
+                        👀 Players
+                      </Button>
                       {f.status !== 'completed' && (
                         <>
                           <Button
