@@ -220,6 +220,7 @@ export default async function FixtureDetailPage({ params }: Props) {
               prediction={(prediction as MatchPrediction) ?? null}
               isPredictionOpen={open}
               deadlineDate={deadline.toISOString()}
+              settings={matchSettings}
             />
           )}
 

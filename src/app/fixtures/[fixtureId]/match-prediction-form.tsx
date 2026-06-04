@@ -4,7 +4,7 @@ import { useState, useTransition, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { submitMatchPrediction } from './actions';
-import type { Fixture, MatchPrediction } from '@/types/fixture';
+import type { Fixture, MatchPrediction, MatchSettings } from '@/types/fixture';
 import type { Team } from '@/types/team';
 import type { Player } from '@/types/player';
 
@@ -16,6 +16,7 @@ interface Props {
   prediction: MatchPrediction | null;
   isPredictionOpen: boolean;
   deadlineDate: string;
+  settings: MatchSettings;
 }
 
 export function MatchPredictionForm({
@@ -26,6 +27,7 @@ export function MatchPredictionForm({
   prediction,
   isPredictionOpen: initialOpen,
   deadlineDate,
+  settings,
 }: Props) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -150,6 +152,37 @@ export function MatchPredictionForm({
             ✅ Prediction {hasPrediction ? 'updated' : 'submitted'} successfully!
           </p>
         )}
+
+        {/* Scoring Rules */}
+        <div className="rounded-lg bg-blue-50 border border-blue-200 p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-blue-600">📊</span>
+            <p className="text-sm font-semibold text-blue-900">How Points Are Calculated</p>
+          </div>
+          <div className="space-y-1 text-xs text-blue-800">
+            <div className="grid grid-cols-2 gap-2">
+              <span>🏆 Correct Winner:</span>
+              <span className="font-medium">{settings.points_team_win} points</span>
+              <span>⭐ Man of the Match:</span>
+              <span className="font-medium">{settings.points_mom} points</span>
+              <span>🏏 Highest Scorer:</span>
+              <span className="font-medium">{settings.points_highest_scorer} points</span>
+              <span>🎳 Most Wickets:</span>
+              <span className="font-medium">{settings.points_highest_wicket_taker} points</span>
+            </div>
+            <div className="border-t border-blue-300 pt-2 mt-2">
+              <p className="text-[11px]">
+                <span className="font-medium">📝 Tie-breaker Rule:</span> Earliest prediction submission
+              </p>
+              <p className="text-[11px] mt-1">
+                <span className="font-medium">🏏 Highest Scorer Rule:</span> If multiple players score the same, winning team player is chosen. If multiple winning team players tie, highest strike rate wins.
+              </p>
+              <p className="text-[11px] mt-1">
+                <span className="font-medium">🎳 Most Wickets Rule:</span> If multiple players take same wickets, winning team player is chosen. If multiple winning team players tie, best economy rate wins.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Winning team */}
         <div className="space-y-1.5">
