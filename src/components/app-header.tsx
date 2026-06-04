@@ -10,7 +10,7 @@ interface AppHeaderProps {
 }
 
 const NAV_LINKS = [
-  { href: '/predictions', label: '🎯 Auction' },
+  { href: '/predictions', label: '🎯 Auction', disabled: true },
   { href: '/scores', label: '📊 Scores' },
   { href: '/fixtures', label: '📅 Fixtures' },
   { href: '/leaderboard', label: '🏆 Leaderboard' },
@@ -30,15 +30,24 @@ export function AppHeader({ showAdmin = false, shareCardData }: AppHeaderProps) 
           </Link>
         </div>
         <div className="flex items-center gap-1 sm:gap-3">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground sm:text-sm"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => 
+            link.disabled ? (
+              <span
+                key={link.href}
+                className="rounded-md px-2 py-1.5 text-xs font-medium text-gray-400 cursor-not-allowed opacity-60 sm:text-sm"
+              >
+                {link.label}
+              </span>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground sm:text-sm"
+              >
+                {link.label}
+              </Link>
+            )
+          )}
           <ShareButton cardData={shareCardData} />
           {showAdmin && (
             <Link

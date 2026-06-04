@@ -54,26 +54,36 @@ export default async function HomePage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link href="/predictions" className="group">
-              <Card className="h-full border-t-4 border-t-emerald-500 transition-shadow group-hover:shadow-md">
+            <div className="group cursor-not-allowed">
+              <Card className="h-full border-t-4 border-t-gray-300 bg-gray-50 opacity-75">
                 <CardContent className="space-y-2 pt-4 text-center">
                   <span className="text-3xl">🎯</span>
-                  <CardTitle className="text-base">Auction Predictions</CardTitle>
-                  <p className="text-xs text-muted-foreground">
+                  <CardTitle className="text-base text-gray-600">Auction Predictions</CardTitle>
+                  <p className="text-xs text-gray-500">
                     Predict selling prices and buying teams for each player.
                   </p>
+                  <div className="mt-2">
+                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-200 text-gray-700 rounded-full">
+                      ✅ Completed
+                    </span>
+                  </div>
                 </CardContent>
               </Card>
-            </Link>
+            </div>
 
             <Link href="/fixtures" className="group">
-              <Card className="h-full border-t-4 border-t-violet-500 transition-shadow group-hover:shadow-md">
+              <Card className="h-full border-t-4 border-t-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 shadow-lg ring-2 ring-violet-200 transition-all group-hover:shadow-xl">
                 <CardContent className="space-y-2 pt-4 text-center">
-                  <span className="text-3xl">📅</span>
-                  <CardTitle className="text-base">Fixture Predictions</CardTitle>
-                  <p className="text-xs text-muted-foreground">
+                  <span className="text-2xl">📅</span>
+                  <CardTitle className="text-base font-semibold text-violet-700">Fixture Predictions</CardTitle>
+                  <p className="text-xs text-violet-600 font-medium">
                     View matches and predict match outcomes.
                   </p>
+                  <div className="mt-2">
+                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-violet-100 text-violet-800 rounded-full">
+                      🔥 Active Now
+                    </span>
+                  </div>
                 </CardContent>
               </Card>
             </Link>
