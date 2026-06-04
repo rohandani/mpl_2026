@@ -143,38 +143,38 @@ export function PlayersToWatchManager({
 
         {/* Existing players */}
         {playersToWatch.length > 0 && (
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {playersToWatch.map((ptw) => (
               <div
                 key={ptw.id}
-                className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30"
+                className="flex items-start gap-3 p-3 border rounded-lg bg-muted/30"
               >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{ptw.player.name}</span>
-                    <span className="text-xs text-muted-foreground">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium truncate">{ptw.player.name}</span>
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
                       ({ptw.player.role})
                     </span>
-                    <span className="text-xs px-2 py-1 rounded-full bg-background">
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-background flex-shrink-0">
                       {teamMap.get(ptw.player.team_id ?? '')?.name}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary flex-shrink-0">
                       {HIGHLIGHT_TYPE_LABELS[ptw.highlight_type]}
                     </span>
-                    {ptw.description && (
-                      <span className="text-xs text-muted-foreground">
-                        {ptw.description}
-                      </span>
-                    )}
                   </div>
+                  {ptw.description && (
+                    <p className="text-xs text-muted-foreground overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                      {ptw.description}
+                    </p>
+                  )}
                 </div>
                 <Button
                   onClick={() => removePlayer(ptw.id)}
                   variant="ghost"
                   size="sm"
-                  className="text-destructive hover:text-destructive"
+                  className="text-destructive hover:text-destructive flex-shrink-0"
                   disabled={isPending}
                 >
                   <TrashIcon className="w-4 h-4" />

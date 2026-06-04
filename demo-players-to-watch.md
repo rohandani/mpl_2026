@@ -37,7 +37,9 @@ I've successfully implemented a comprehensive "Players to Watch" feature that en
   - 🏥 Return from Injury (green)
   - 👑 Captain (amber)
 - **Custom Descriptions**: Add context for why users should watch this player
-- **Easy Management**: Add/remove players with real-time updates
+- **Real-Time Updates**: Changes appear immediately without page refresh
+- **Instant Feedback**: Success/error messages confirm operations
+- **Loading States**: Visual indicators during add/remove operations
 
 ### 📊 Enhanced Historical Insights
 When historical data is available, the system still shows:
@@ -68,7 +70,9 @@ Created `players_to_watch` table with:
 2. **Selects players** → Chooses from dropdown of team players  
 3. **Sets highlight type** → Picks appropriate category
 4. **Adds description** → Provides context for users
-5. **Saves instantly** → Updates appear immediately on fixture page
+5. **Saves instantly** → Updates appear immediately in the interface
+6. **Real-time feedback** → Success messages confirm the operation
+7. **Remove easily** → Click trash icon to remove players instantly
 
 ## Benefits for Users
 

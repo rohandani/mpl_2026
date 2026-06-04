@@ -43,8 +43,15 @@ export function MatchPredictionForm({
   // Live countdown
   const [open, setOpen] = useState(initialOpen);
   const [timeLeft, setTimeLeft] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+    
     const deadline = new Date(deadlineDate);
 
     function tick() {
@@ -70,7 +77,7 @@ export function MatchPredictionForm({
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [deadlineDate]);
+  }, [deadlineDate, isClient]);
 
   function handleSubmit() {
     setError(null);
@@ -130,7 +137,7 @@ export function MatchPredictionForm({
               {hasPrediction ? 'Update Prediction' : 'Make Your Prediction'}
             </p>
           </div>
-          {timeLeft && (
+          {isClient && timeLeft && (
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
               ⏱ {timeLeft}
             </span>

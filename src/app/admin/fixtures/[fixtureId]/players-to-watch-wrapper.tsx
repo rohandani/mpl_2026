@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PlayersToWatchManager } from './players-to-watch';
 import type { Player } from '@/types/player';
 import type { PlayerToWatch } from '@/types/player-to-watch';
@@ -20,33 +20,20 @@ export function PlayersToWatchManagerWrapper({
   teams,
   initialPlayersToWatch,
 }: Props) {
-  const [playersToWatch, setPlayersToWatch] = useState(initialPlayersToWatch);
-  const [isLoading, setIsLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(Date.now());
 
-  async function refreshData() {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/admin/fixtures/${fixtureId}/players-to-watch`);
-      if (response.ok) {
-        const data = await response.json();
-        setPlayersToWatch(data);
-      }
-    } catch (error) {
-      console.error('Failed to refresh players to watch:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  // Simple callback to trigger any parent-level updates if needed
+  const handleUpdate = () => {
+    setLastUpdated(Date.now());
+  };
 
   return (
-    <div className={isLoading ? 'opacity-50 pointer-events-none' : ''}>
-      <PlayersToWatchManager
-        fixtureId={fixtureId}
-        players={players}
-        teams={teams}
-        existingPlayersToWatch={playersToWatch}
-        onUpdate={refreshData}
-      />
-    </div>
+    <PlayersToWatchManager
+      fixtureId={fixtureId}
+      players={players}
+      teams={teams}
+      existingPlayersToWatch={initialPlayersToWatch}
+      onUpdate={handleUpdate}
+    />
   );
 }

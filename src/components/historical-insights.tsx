@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, TrendingUp, Users, Target, Eye } from 'lucide-react';
 import type { Fixture } from '@/types/fixture';
 import type { Team } from '@/types/team';
@@ -44,12 +44,31 @@ interface Props {
 
 export function HistoricalInsights({ currentFixture, teams, players, completedFixtures, playersToWatch }: Props) {
   const [activeTab, setActiveTab] = useState<'h2h' | 'players' | 'teams'>('h2h');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const currentTeamA = teamMap.get(currentFixture.team_a_id);
   const currentTeamB = teamMap.get(currentFixture.team_b_id);
 
   if (!currentTeamA || !currentTeamB) return null;
+
+  // Don't render complex calculations on server to avoid hydration mismatch
+  if (!isClient) {
+    return (
+      <div className="space-y-4">
+        {/* Players to Watch - Always shown */}
+        <PlayersToWatchSection 
+          playersToWatch={playersToWatch}
+          teamA={currentTeamA}
+          teamB={currentTeamB}
+        />
+      </div>
+    );
+  }
 
   // Calculate Head-to-Head stats
   const h2hMatches = completedFixtures.filter(
@@ -191,7 +210,7 @@ function PlayersToWatchSection({
             </div>
           </div>
         ) : (
-          <div className="grid gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {playersToWatch
               .sort((a, b) => a.sort_order - b.sort_order)
               .map((ptw) => (
@@ -226,28 +245,30 @@ function PlayerToWatchCard({
   return (
     <div className={`border rounded-lg p-3 ${bgColor}`}>
       <div className="flex items-start justify-between mb-2">
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`font-semibold ${textColor}`}>
+            <span className={`font-semibold text-sm truncate ${textColor}`}>
               {playerToWatch.player.name}
             </span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground flex-shrink-0">
               ({playerToWatch.player.role})
             </span>
           </div>
           <p className="text-xs text-muted-foreground">{team.name}</p>
         </div>
-        
-        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${HIGHLIGHT_TYPE_COLORS[playerToWatch.highlight_type]}`}>
-          {HIGHLIGHT_TYPE_LABELS[playerToWatch.highlight_type]}
-        </span>
       </div>
       
-      {playerToWatch.description && (
-        <p className="text-sm text-muted-foreground">
-          {playerToWatch.description}
-        </p>
-      )}
+      <div className="flex flex-col gap-1">
+        <span className={`px-2 py-1 rounded-full text-xs font-medium border self-start ${HIGHLIGHT_TYPE_COLORS[playerToWatch.highlight_type]}`}>
+          {HIGHLIGHT_TYPE_LABELS[playerToWatch.highlight_type]}
+        </span>
+        
+        {playerToWatch.description && (
+          <p className="text-xs text-muted-foreground overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            {playerToWatch.description}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
