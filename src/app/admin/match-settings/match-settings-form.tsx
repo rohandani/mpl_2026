@@ -15,6 +15,7 @@ export function MatchSettingsForm({ settings }: Props) {
   const [pointsMom, setPointsMom] = useState(settings.points_mom);
   const [pointsHighestScorer, setPointsHighestScorer] = useState(settings.points_highest_scorer);
   const [pointsHighestWicketTaker, setPointsHighestWicketTaker] = useState(settings.points_highest_wicket_taker);
+  const [showHistoricalInsights, setShowHistoricalInsights] = useState(settings.show_historical_insights);
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -26,7 +27,8 @@ export function MatchSettingsForm({ settings }: Props) {
         pointsTeamWin,
         pointsMom,
         pointsHighestScorer,
-        pointsHighestWicketTaker
+        pointsHighestWicketTaker,
+        showHistoricalInsights
       );
       if (res.success) {
         setMessage({ type: 'success', text: 'Settings saved!' });
@@ -62,6 +64,24 @@ export function MatchSettingsForm({ settings }: Props) {
         />
         <p className="text-xs text-muted-foreground">
           Predictions lock this many minutes before the scheduled match time.
+        </p>
+      </div>
+
+      <hr className="border-border" />
+
+      <div className="space-y-1.5">
+        <label htmlFor="showHistoricalInsights" className="text-sm font-medium flex items-center gap-2">
+          <input
+            id="showHistoricalInsights"
+            type="checkbox"
+            checked={showHistoricalInsights}
+            onChange={(e) => setShowHistoricalInsights(e.target.checked)}
+            className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-ring/50"
+          />
+          Show Historical Insights
+        </label>
+        <p className="text-xs text-muted-foreground">
+          Display head-to-head stats and team performance data on fixture pages.
         </p>
       </div>
 

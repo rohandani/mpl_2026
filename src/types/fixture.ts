@@ -35,5 +35,6 @@ export interface MatchSettings {
   points_mom: number;
   points_highest_scorer: number;
   points_highest_wicket_taker: number;
+  show_historical_insights: boolean;
   updated_at: string;
 }

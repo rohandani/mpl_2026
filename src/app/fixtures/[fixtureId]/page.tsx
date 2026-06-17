@@ -221,6 +221,7 @@ export default async function FixtureDetailPage({ params }: Props) {
               players={teamPlayers}
               completedFixtures={completedFixtures}
               playersToWatch={(playersToWatch as any[]) ?? []}
+              matchSettings={{ show_historical_insights: settings?.show_historical_insights ?? true }}
             />
           )}
 

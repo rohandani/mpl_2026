@@ -41,9 +41,10 @@ interface Props {
   playersToWatch: (PlayerToWatch & {
     player: Pick<Player, 'id' | 'name' | 'role' | 'team_id'>;
   })[];
+  matchSettings: { show_historical_insights: boolean };
 }
 
-export function HistoricalInsights({ currentFixture, teams, players, completedFixtures, playersToWatch }: Props) {
+export function HistoricalInsights({ currentFixture, teams, players, completedFixtures, playersToWatch, matchSettings }: Props) {
   const [activeTab, setActiveTab] = useState<'h2h' | 'players' | 'teams'>('h2h');
   const [isClient, setIsClient] = useState(false);
 
@@ -149,8 +150,8 @@ export function HistoricalInsights({ currentFixture, teams, players, completedFi
         teamB={currentTeamB}
       />
 
-      {/* Historical Insights - Only if data available */}
-      {completedFixtures.length > 0 && (
+      {/* Historical Insights - Only if data available and setting enabled */}
+      {completedFixtures.length > 0 && matchSettings.show_historical_insights && (
         <HistoricalDataSection
           currentFixture={currentFixture}
           currentTeamA={currentTeamA}

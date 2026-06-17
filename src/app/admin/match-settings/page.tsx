@@ -17,6 +17,7 @@ export default async function MatchSettingsPage() {
     points_mom: 15,
     points_highest_scorer: 15,
     points_highest_wicket_taker: 10,
+    show_historical_insights: true,
     updated_at: new Date().toISOString(),
   };
 

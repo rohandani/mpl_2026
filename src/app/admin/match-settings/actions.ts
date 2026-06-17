@@ -10,7 +10,8 @@ export async function updateMatchSettings(
   pointsTeamWin: number,
   pointsMom: number,
   pointsHighestScorer: number,
-  pointsHighestWicketTaker: number
+  pointsHighestWicketTaker: number,
+  showHistoricalInsights: boolean
 ): Promise<ActionResult> {
   const supabase = await createClient();
   const {
@@ -37,6 +38,7 @@ export async function updateMatchSettings(
       points_mom: pointsMom,
       points_highest_scorer: pointsHighestScorer,
       points_highest_wicket_taker: pointsHighestWicketTaker,
+      show_historical_insights: showHistoricalInsights,
       updated_at: new Date().toISOString(),
     })
     .eq('id', 'default');
