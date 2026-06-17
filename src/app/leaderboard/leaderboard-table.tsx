@@ -23,8 +23,8 @@ interface Props {
 const RANK_ICONS = ['🥇', '🥈', '🥉'];
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'auction', label: 'Auction' },
   { key: 'matches', label: 'Matches' },
+  { key: 'auction', label: 'Auction' },
 ];
 
 export function LeaderboardTable({
@@ -34,7 +34,7 @@ export function LeaderboardTable({
   teams,
   players,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<Tab>('auction');
+  const [activeTab, setActiveTab] = useState<Tab>('matches');
 
   return (
     <div className="space-y-6">
@@ -51,8 +51,8 @@ export function LeaderboardTable({
         </div>
       </div>
 
-      {/* Auction Winner */}
-      {auctionEntries.length > 0 && (
+      {/* Auction Winner - only show when on Auction tab */}
+      {activeTab === 'auction' && auctionEntries.length > 0 && (
         <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
           <span className="text-2xl">👑</span>
           <div>
@@ -71,11 +71,10 @@ export function LeaderboardTable({
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${activeTab === tab.key
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
             {tab.label}
           </button>
@@ -172,9 +171,8 @@ function AuctionTable({
           return (
             <tr
               key={entry.user_id}
-              className={`border-b border-border last:border-0 transition-colors ${
-                isCurrentUser ? 'bg-amber-50' : 'hover:bg-muted/30'
-              }`}
+              className={`border-b border-border last:border-0 transition-colors ${isCurrentUser ? 'bg-amber-50' : 'hover:bg-muted/30'
+                }`}
             >
               <RankCell index={i} />
               <PlayerCell name={entry.display_name} isCurrentUser={isCurrentUser} />
@@ -227,9 +225,9 @@ function MatchesTable({
     matchesMap.get(d.fixture_id)!.users.push(d);
   }
 
-  // Sort matches by match_number, users already sorted by total_points DESC from RPC
+  // Sort matches by date in ascending order (earliest first), users already sorted by total_points DESC from RPC
   const matches = Array.from(matchesMap.entries()).sort(
-    (a, b) => a[1].match_number - b[1].match_number
+    (a, b) => new Date(a[1].match_date).getTime() - new Date(b[1].match_date).getTime()
   );
 
   if (matches.length === 0) {
@@ -281,13 +279,12 @@ function MatchesTable({
                     <button
                       type="button"
                       onClick={() => setExpandedKey(isExpanded ? null : key)}
-                      className={`w-full grid grid-cols-[2rem_1fr_3rem_1.25rem] gap-2 px-4 py-2.5 text-sm text-left transition-colors ${
-                        isCurrentUser
-                          ? 'bg-amber-50'
-                          : isWinner
-                            ? 'bg-emerald-50'
-                            : 'hover:bg-muted/30'
-                      } ${isExpanded ? 'bg-muted/20' : ''}`}
+                      className={`w-full grid grid-cols-[2rem_1fr_3rem_1.25rem] gap-2 px-4 py-2.5 text-sm text-left transition-colors ${isCurrentUser
+                        ? 'bg-amber-50'
+                        : isWinner
+                          ? 'bg-emerald-50'
+                          : 'hover:bg-muted/30'
+                        } ${isExpanded ? 'bg-muted/20' : ''}`}
                       aria-expanded={isExpanded}
                     >
                       <span>
@@ -299,9 +296,8 @@ function MatchesTable({
                       </span>
                       <span className="truncate">
                         <span
-                          className={`font-semibold ${
-                            isCurrentUser ? 'text-foreground' : isWinner ? 'text-emerald-700' : ''
-                          }`}
+                          className={`font-semibold ${isCurrentUser ? 'text-foreground' : isWinner ? 'text-emerald-700' : ''
+                            }`}
                         >
                           {entry.display_name}
                         </span>
@@ -313,9 +309,8 @@ function MatchesTable({
                         )}
                       </span>
                       <span
-                        className={`text-right font-bold ${
-                          isWinner ? 'text-emerald-600' : 'text-primary'
-                        }`}
+                        className={`text-right font-bold ${isWinner ? 'text-emerald-600' : 'text-primary'
+                          }`}
                       >
                         {entry.total_points}
                       </span>
