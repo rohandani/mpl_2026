@@ -18,14 +18,25 @@ export default async function FixturesPage() {
     .select('*')
     .order('name');
 
-  // Get all match predictions with user profiles
+  // Get all match predictions
   const { data: matchPredictions } = await supabase
     .from('match_predictions')
-    .select(`
-      *,
-      profiles(display_name)
-    `)
+    .select('*')
     .order('created_at', { ascending: false });
+
+  // Get user profiles for display names
+  const userIds = [...new Set((matchPredictions ?? []).map(p => p.user_id))];
+  const { data: profiles } = userIds.length > 0 ? await supabase
+    .from('profiles')
+    .select('id, display_name')
+    .in('id', userIds) : { data: [] };
+
+  // Combine the data
+  const profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
+  const enrichedPredictions = (matchPredictions ?? []).map(p => ({
+    ...p,
+    profiles: profileMap.get(p.user_id) || null
+  }));
 
   return (
     <div className="space-y-6">
@@ -40,7 +51,7 @@ export default async function FixturesPage() {
         fixtures={(fixtures as Fixture[]) ?? []}
         teams={(teams as Team[]) ?? []}
         players={(players as Player[]) ?? []}
-        matchPredictions={matchPredictions ?? []}
+        matchPredictions={enrichedPredictions ?? []}
       />
     </div>
   );
