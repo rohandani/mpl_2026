@@ -129,15 +129,33 @@ function FixtureCard({
         <TeamBadge team={teamA} />
         <div className="flex flex-col items-center gap-1">
           <span className="text-xs font-medium text-muted-foreground">vs</span>
+          {/* Match timing in PT */}
+          <div className="text-center">
+            <div className="text-xs font-medium text-foreground">
+              {matchDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                timeZone: 'America/Los_Angeles'
+              })}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {matchDate.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'America/Los_Angeles'
+              })} PT
+            </div>
+          </div>
         </div>
         <TeamBadge team={teamB} />
       </div>
 
-      {/* Bottom row: date/venue + action hint */}
+      {/* Bottom row: venue + action hint */}
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
         <div>
-          <span>{matchDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-          {fixture.venue && <span> · {fixture.venue}</span>}
+          {fixture.venue && <span>📍 {fixture.venue}</span>}
         </div>
         {open && !prediction && (
           <span className="font-medium text-primary">Predict →</span>

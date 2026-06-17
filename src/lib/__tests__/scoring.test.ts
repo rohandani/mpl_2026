@@ -29,6 +29,7 @@ const completedFixture: Fixture = {
   match_date: '2026-04-01T14:00:00Z',
   venue: 'Stadium',
   status: 'completed',
+  stage: 'Group Stage',
   winning_team_id: 'team-a',
   mom_player_id: 'player-1',
   highest_scorer_id: 'player-2',

@@ -160,7 +160,21 @@ export default async function FixtureDetailPage({ params }: Props) {
 
               {/* Date & venue */}
               <div className="text-center text-sm text-muted-foreground space-y-0.5">
-                <p>📅 {new Date(f.match_date).toLocaleString()}</p>
+                <p>📅 {new Date(f.match_date).toLocaleDateString('en-US', { 
+                  weekday: 'long',
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric',
+                  timeZone: 'America/Los_Angeles'
+                })}</p>
+                <p className="text-lg font-bold text-primary">
+                  {new Date(f.match_date).toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: 'America/Los_Angeles'
+                  })} PT
+                </p>
                 {f.venue && <p>📍 {f.venue}</p>}
               </div>
 
