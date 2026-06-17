@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { FixtureForm } from './fixture-form';
 import { FixtureResultForm } from './fixture-result-form';
 import { togglePredictionLock } from './actions';
-import { MatchPredictionsModal } from './match-predictions-modal';
 import type { Fixture, MatchPrediction } from '@/types/fixture';
 import type { Team } from '@/types/team';
 import type { Player } from '@/types/player';
@@ -25,7 +25,6 @@ export function FixtureAdminList({ fixtures, teams, players, matchPredictions }:
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
-  const [predictionsModalId, setPredictionsModalId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const teamMap = new Map(teams.map((t) => [t.id, t]));
@@ -101,14 +100,15 @@ export function FixtureAdminList({ fixtures, teams, players, matchPredictions }:
                     <td className="py-2.5 text-muted-foreground">{f.venue ?? '—'}</td>
                     <td className="py-2.5">
                       {fixturePredictions.length > 0 ? (
-                        <Button
-                          size="xs"
-                          variant="outline"
-                          onClick={() => setPredictionsModalId(f.id)}
-                          className="text-xs"
-                        >
-                          {fixturePredictions.length} prediction{fixturePredictions.length !== 1 ? 's' : ''}
-                        </Button>
+                        <Link href={`/admin/fixtures/${f.id}/predictions`}>
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            {fixturePredictions.length} prediction{fixturePredictions.length !== 1 ? 's' : ''}
+                          </Button>
+                        </Link>
                       ) : (
                         <span className="text-xs text-muted-foreground">No predictions</span>
                       )}
@@ -188,17 +188,6 @@ export function FixtureAdminList({ fixtures, teams, players, matchPredictions }:
             onDone={() => setResultId(null)}
           />
         </div>
-      )}
-
-      {/* Predictions Modal */}
-      {predictionsModalId && (
-        <MatchPredictionsModal
-          fixture={fixtures.find((f) => f.id === predictionsModalId)!}
-          predictions={predictionsByFixture.get(predictionsModalId) || []}
-          teams={teams}
-          players={players}
-          onClose={() => setPredictionsModalId(null)}
-        />
       )}
     </div>
   );
