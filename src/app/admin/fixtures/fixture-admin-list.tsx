@@ -5,23 +5,40 @@ import { Button } from '@/components/ui/button';
 import { FixtureForm } from './fixture-form';
 import { FixtureResultForm } from './fixture-result-form';
 import { togglePredictionLock } from './actions';
-import type { Fixture } from '@/types/fixture';
+import { MatchPredictionsModal } from './match-predictions-modal';
+import type { Fixture, MatchPrediction } from '@/types/fixture';
 import type { Team } from '@/types/team';
 import type { Player } from '@/types/player';
+
+interface MatchPredictionWithProfile extends MatchPrediction {
+  profiles: { display_name: string | null } | null;
+}
 
 interface Props {
   fixtures: Fixture[];
   teams: Team[];
   players: Player[];
+  matchPredictions: MatchPredictionWithProfile[];
 }
 
-export function FixtureAdminList({ fixtures, teams, players }: Props) {
+export function FixtureAdminList({ fixtures, teams, players, matchPredictions }: Props) {
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
+  const [predictionsModalId, setPredictionsModalId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const teamMap = new Map(teams.map((t) => [t.id, t]));
+  const playerMap = new Map(players.map((p) => [p.id, p]));
+
+  // Group predictions by fixture
+  const predictionsByFixture = new Map<string, MatchPredictionWithProfile[]>();
+  matchPredictions.forEach((prediction) => {
+    if (!predictionsByFixture.has(prediction.fixture_id)) {
+      predictionsByFixture.set(prediction.fixture_id, []);
+    }
+    predictionsByFixture.get(prediction.fixture_id)!.push(prediction);
+  });
 
   function handleToggleLock(fixtureId: string, currentlyLocked: boolean) {
     startTransition(async () => {
@@ -57,6 +74,7 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
                 <th className="py-2.5 text-left font-medium text-muted-foreground">Teams</th>
                 <th className="py-2.5 text-left font-medium text-muted-foreground">Date</th>
                 <th className="py-2.5 text-left font-medium text-muted-foreground">Venue</th>
+                <th className="py-2.5 text-left font-medium text-muted-foreground">Predictions</th>
                 <th className="py-2.5 text-left font-medium text-muted-foreground">Status</th>
                 <th className="py-2.5 pr-4 text-right font-medium text-muted-foreground">Actions</th>
               </tr>
@@ -67,6 +85,7 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
                 const teamB = teamMap.get(f.team_b_id);
                 const isEditing = editingId === f.id;
                 const isResult = resultId === f.id;
+                const fixturePredictions = predictionsByFixture.get(f.id) || [];
 
                 return (
                   <tr key={f.id} className="border-b border-border last:border-0">
@@ -80,6 +99,20 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
                       })}
                     </td>
                     <td className="py-2.5 text-muted-foreground">{f.venue ?? '—'}</td>
+                    <td className="py-2.5">
+                      {fixturePredictions.length > 0 ? (
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          onClick={() => setPredictionsModalId(f.id)}
+                          className="text-xs"
+                        >
+                          {fixturePredictions.length} prediction{fixturePredictions.length !== 1 ? 's' : ''}
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No predictions</span>
+                      )}
+                    </td>
                     <td className="py-2.5">
                       <span className="flex items-center gap-1">
                         <StatusBadge status={f.status} />
@@ -155,6 +188,17 @@ export function FixtureAdminList({ fixtures, teams, players }: Props) {
             onDone={() => setResultId(null)}
           />
         </div>
+      )}
+
+      {/* Predictions Modal */}
+      {predictionsModalId && (
+        <MatchPredictionsModal
+          fixture={fixtures.find((f) => f.id === predictionsModalId)!}
+          predictions={predictionsByFixture.get(predictionsModalId) || []}
+          teams={teams}
+          players={players}
+          onClose={() => setPredictionsModalId(null)}
+        />
       )}
     </div>
   );

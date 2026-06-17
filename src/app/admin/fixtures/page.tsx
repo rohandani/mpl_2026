@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { FixtureAdminList } from './fixture-admin-list';
-import type { Fixture } from '@/types/fixture';
+import type { Fixture, MatchPrediction } from '@/types/fixture';
 import type { Team } from '@/types/team';
 import type { Player } from '@/types/player';
 
@@ -18,6 +18,15 @@ export default async function FixturesPage() {
     .select('*')
     .order('name');
 
+  // Get all match predictions with user profiles
+  const { data: matchPredictions } = await supabase
+    .from('match_predictions')
+    .select(`
+      *,
+      profiles(display_name)
+    `)
+    .order('created_at', { ascending: false });
+
   return (
     <div className="space-y-6">
       <div>
@@ -31,6 +40,7 @@ export default async function FixturesPage() {
         fixtures={(fixtures as Fixture[]) ?? []}
         teams={(teams as Team[]) ?? []}
         players={(players as Player[]) ?? []}
+        matchPredictions={matchPredictions ?? []}
       />
     </div>
   );
