@@ -10,7 +10,7 @@ export default async function FixturesPage() {
   const { data: fixtures } = await supabase
     .from('fixtures')
     .select('*')
-    .order('match_number', { ascending: true });
+    .order('match_date', { ascending: true });
 
   const { data: teams } = await supabase.from('teams').select('*');
   const { data: players } = await supabase
