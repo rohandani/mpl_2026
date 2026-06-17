@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { ChevronDown, TrendingUp, Users, Target, Eye } from 'lucide-react';
 import type { Fixture } from '@/types/fixture';
 import type { Team } from '@/types/team';
@@ -61,7 +62,7 @@ export function HistoricalInsights({ currentFixture, teams, players, completedFi
     return (
       <div className="space-y-4">
         {/* Players to Watch - Always shown */}
-        <PlayersToWatchSection 
+        <PlayersToWatchSection
           playersToWatch={playersToWatch}
           teamA={currentTeamA}
           teamB={currentTeamB}
@@ -79,7 +80,7 @@ export function HistoricalInsights({ currentFixture, teams, players, completedFi
 
   const teamAH2HWins = h2hMatches.filter((f) => f.winning_team_id === currentFixture.team_a_id).length;
   const teamBH2HWins = h2hMatches.filter((f) => f.winning_team_id === currentFixture.team_b_id).length;
-  
+
   const lastFiveH2H = h2hMatches
     .sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime())
     .slice(0, 5)
@@ -142,7 +143,7 @@ export function HistoricalInsights({ currentFixture, teams, players, completedFi
   return (
     <div className="space-y-4">
       {/* Players to Watch - Always shown */}
-      <PlayersToWatchSection 
+      <PlayersToWatchSection
         playersToWatch={playersToWatch}
         teamA={currentTeamA}
         teamB={currentTeamB}
@@ -168,11 +169,11 @@ export function HistoricalInsights({ currentFixture, teams, players, completedFi
   );
 }
 
-function PlayersToWatchSection({ 
-  playersToWatch, 
-  teamA, 
-  teamB 
-}: { 
+function PlayersToWatchSection({
+  playersToWatch,
+  teamA,
+  teamB
+}: {
   playersToWatch: (PlayerToWatch & { player: Pick<Player, 'id' | 'name' | 'role' | 'team_id'> })[];
   teamA: Team;
   teamB: Team;
@@ -180,7 +181,7 @@ function PlayersToWatchSection({
   return (
     <div className="rounded-xl ring-1 ring-border overflow-hidden">
       <div className="h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500" />
-      
+
       <div className="p-4">
         <div className="flex items-center gap-2 mb-4">
           <Eye className="w-5 h-5 text-indigo-500" />
@@ -210,7 +211,7 @@ function PlayersToWatchSection({
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-2">
             {playersToWatch
               .sort((a, b) => a.sort_order - b.sort_order)
               .map((ptw) => (
@@ -228,11 +229,11 @@ function PlayersToWatchSection({
   );
 }
 
-function PlayerToWatchCard({ 
-  playerToWatch, 
-  teamA, 
-  teamB 
-}: { 
+function PlayerToWatchCard({
+  playerToWatch,
+  teamA,
+  teamB
+}: {
   playerToWatch: PlayerToWatch & { player: Pick<Player, 'id' | 'name' | 'role' | 'team_id'> };
   teamA: Team;
   teamB: Team;
@@ -240,35 +241,39 @@ function PlayerToWatchCard({
   const isTeamA = playerToWatch.player.team_id === teamA.id;
   const team = isTeamA ? teamA : teamB;
   const bgColor = isTeamA ? 'bg-blue-50 border-blue-200' : 'bg-purple-50 border-purple-200';
-  const textColor = isTeamA ? 'text-blue-900' : 'text-purple-900';
 
   return (
     <div className={`border rounded-lg p-3 ${bgColor}`}>
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className={`font-semibold text-sm truncate ${textColor}`}>
-              {playerToWatch.player.name}
-            </span>
-            <span className="text-xs text-muted-foreground flex-shrink-0">
-              ({playerToWatch.player.role})
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground">{team.name}</p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <Image
+            src={team.logo}
+            alt={`${team.name} logo`}
+            width={24}
+            height={24}
+            className="flex-shrink-0 rounded"
+          />
+          <span className="font-semibold text-sm truncate">
+            {playerToWatch.player.name}
+          </span>
+          <span className="text-xs text-muted-foreground flex-shrink-0">
+            ({playerToWatch.player.role})
+          </span>
+          <span className="text-xs text-muted-foreground flex-shrink-0">
+            {team.name}
+          </span>
         </div>
-      </div>
-      
-      <div className="flex flex-col gap-1">
-        <span className={`px-2 py-1 rounded-full text-xs font-medium border self-start ${HIGHLIGHT_TYPE_COLORS[playerToWatch.highlight_type]}`}>
+
+        <span className={`px-2 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${HIGHLIGHT_TYPE_COLORS[playerToWatch.highlight_type]}`}>
           {HIGHLIGHT_TYPE_LABELS[playerToWatch.highlight_type]}
         </span>
-        
-        {playerToWatch.description && (
-          <p className="text-xs text-muted-foreground overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-            {playerToWatch.description}
-          </p>
-        )}
       </div>
+
+      {playerToWatch.description && (
+        <p className="text-xs text-muted-foreground mt-2 overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          {playerToWatch.description}
+        </p>
+      )}
     </div>
   );
 }
@@ -307,7 +312,7 @@ function HistoricalDataSection({
   return (
     <div className="rounded-xl ring-1 ring-border overflow-hidden">
       <div className="h-1.5 bg-gradient-to-r from-blue-500 to-purple-500" />
-      
+
       {/* Header */}
       <div className="p-4 pb-0">
         <div className="flex items-center gap-2 mb-4">
@@ -322,31 +327,28 @@ function HistoricalDataSection({
         <div className="flex rounded-lg bg-muted/60 p-1">
           <button
             onClick={() => setActiveTab('h2h')}
-            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              activeTab === 'h2h'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === 'h2h'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
             Head-to-Head
           </button>
           <button
             onClick={() => setActiveTab('players')}
-            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              activeTab === 'players'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === 'players'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
             Star Players
           </button>
           <button
             onClick={() => setActiveTab('teams')}
-            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              activeTab === 'teams'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === 'teams'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
             Team Form
           </button>
@@ -438,11 +440,10 @@ function HeadToHeadView({
             {lastFiveResults.map((result, i) => (
               <div
                 key={`${result.match}-${i}`}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                  result.winner.id === teamA.id
-                    ? 'bg-blue-500'
-                    : 'bg-purple-500'
-                }`}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${result.winner.id === teamA.id
+                  ? 'bg-blue-500'
+                  : 'bg-purple-500'
+                  }`}
                 title={`Match #${result.match}: ${result.winner.name} won`}
               >
                 {result.winner.id === teamA.id ? 'A' : 'B'}
@@ -479,20 +480,18 @@ function PlayersView({
       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
         Top Performers This Tournament
       </p>
-      
+
       {topPerformers.map((stat, i) => (
         <div
           key={stat.player.id}
-          className={`flex items-center gap-3 p-2.5 rounded-lg ${
-            stat.player.team_id === teamA.id ? 'bg-blue-50' : 'bg-purple-50'
-          }`}
+          className={`flex items-center gap-3 p-2.5 rounded-lg ${stat.player.team_id === teamA.id ? 'bg-blue-50' : 'bg-purple-50'
+            }`}
         >
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-            stat.player.team_id === teamA.id ? 'bg-blue-500' : 'bg-purple-500'
-          }`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${stat.player.team_id === teamA.id ? 'bg-blue-500' : 'bg-purple-500'
+            }`}>
             #{i + 1}
           </div>
-          
+
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm">{stat.player.name}</span>
@@ -556,7 +555,7 @@ function TeamFormCard({ stats, color }: { stats: TeamStats; color: 'blue' | 'pur
           <span>Win Rate</span>
           <span className="font-semibold">{stats.winPercentage}%</span>
         </div>
-        
+
         <div className="w-full bg-white/60 rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all ${progressColor}`}
