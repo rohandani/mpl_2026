@@ -244,37 +244,78 @@ function PlayerToWatchCard({
   const bgColor = isTeamA ? 'bg-blue-50 border-blue-200' : 'bg-purple-50 border-purple-200';
 
   return (
-    <div className={`border rounded-lg p-3 ${bgColor}`}>
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <Image
-            src={team.logo}
-            alt={`${team.name} logo`}
-            width={24}
-            height={24}
-            className="flex-shrink-0 rounded"
-          />
-          <span className="font-semibold text-sm truncate">
-            {playerToWatch.player.name}
-          </span>
-          <span className="text-xs text-muted-foreground flex-shrink-0">
-            ({playerToWatch.player.role})
-          </span>
-          <span className="text-xs text-muted-foreground flex-shrink-0">
-            {team.name}
+    <div className={`border rounded-lg p-4 ${bgColor}`}>
+      {/* Simple Mobile Layout */}
+      <div className="sm:hidden">
+        {/* Row 1: Team logo + Player name + Badge */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
+            <Image
+              src={team.logo}
+              alt={team.name}
+              width={32}
+              height={32}
+              className="rounded flex-shrink-0"
+            />
+            <h3 className="font-bold text-lg text-gray-900 truncate">
+              {playerToWatch.player.name || 'No Name'}
+            </h3>
+          </div>
+          <span className={`px-3 py-1.5 rounded-full text-xs font-medium border flex-shrink-0 ml-2 ${HIGHLIGHT_TYPE_COLORS[playerToWatch.highlight_type]}`}>
+            {HIGHLIGHT_TYPE_LABELS[playerToWatch.highlight_type]}
           </span>
         </div>
 
-        <span className={`px-2 py-1 rounded-full text-xs font-medium border flex-shrink-0 ${HIGHLIGHT_TYPE_COLORS[playerToWatch.highlight_type]}`}>
+        {/* Row 2: Role and Team - Centered */}
+        <div className="text-center mb-3">
+          <p className="text-sm text-gray-600 font-medium">
+            {playerToWatch.player.role || 'Role'} • {team.name}
+          </p>
+        </div>
+
+        {/* Row 3: Description - Centered */}
+        {playerToWatch.description && (
+          <div className="text-center">
+            <p className="text-sm text-gray-600 leading-relaxed px-2">
+              {playerToWatch.description}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden sm:flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Image
+            src={team.logo}
+            alt={team.name}
+            width={24}
+            height={24}
+            className="rounded"
+          />
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="font-semibold text-sm">
+                {playerToWatch.player.name || 'No Name'}
+              </span>
+              <span className="text-xs text-gray-500">
+                ({playerToWatch.player.role || 'Role'})
+              </span>
+            </div>
+            <div className="text-xs text-gray-500">
+              {team.name}
+            </div>
+            {playerToWatch.description && (
+              <div className="text-xs text-gray-500 mt-1 max-w-md truncate">
+                {playerToWatch.description}
+              </div>
+            )}
+          </div>
+        </div>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${HIGHLIGHT_TYPE_COLORS[playerToWatch.highlight_type]}`}>
           {HIGHLIGHT_TYPE_LABELS[playerToWatch.highlight_type]}
         </span>
       </div>
-
-      {playerToWatch.description && (
-        <p className="text-xs text-muted-foreground mt-2 overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-          {playerToWatch.description}
-        </p>
-      )}
     </div>
   );
 }
